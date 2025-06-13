@@ -149,7 +149,7 @@ void loop() {
 
     if (context.currentScreen == Screen::TEST) {
         if (IsKeyPressed(KEY_BACKSPACE)) {
-            if (context.soundOn) PlaySoundMulti(context.sounds.clickSound1);
+            if (context.soundOn) PlaySound(context.sounds.clickSound1);
 
             if (context.input.size()) {
                 // CTRL + Backspace
@@ -168,10 +168,11 @@ void loop() {
         }
 
         if (key && (context.input.size() < context.sentence.size())) {
-            context.input += key;
+            printf("%x\n", key);
+            context.input += static_cast<char32_t>(key);
 
             if (key != 0) {
-                if (context.soundOn) PlaySoundMulti(context.sounds.clickSound1);
+                if (context.soundOn) PlaySound(context.sounds.clickSound1);
             }
 
             if (context.input.size() == 1 && !context.testRunning) {

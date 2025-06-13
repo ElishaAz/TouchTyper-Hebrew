@@ -6,7 +6,7 @@
 
 void Context::load() {
     Theme arch;
-    arch.name = "Arch";
+    arch.name = u8"Arch";
     arch.background = {6, 7, 9, 255};
     arch.text = {92, 96, 133, 255};
     arch.cursor = {214, 227, 255, 255};
@@ -16,7 +16,7 @@ void Context::load() {
     this->themes.push_back(arch);
 
     Theme black;
-    black.name = "Black";
+    black.name = u8"Black";
     black.background = {17, 17, 17, 255};
     black.text = {96, 96, 96, 255};
     black.cursor = {225, 225, 225, 255};
@@ -26,7 +26,7 @@ void Context::load() {
     this->themes.push_back(black);
 
     Theme white;
-    white.name = "White";
+    white.name = u8"White";
     white.background = {238, 235, 226, 255};
     white.text = {153, 148, 127, 255};
     white.cursor = WHITE;
@@ -36,7 +36,7 @@ void Context::load() {
     this->themes.push_back(white);
 
     Theme espresso;
-    espresso.name = "Espresso";
+    espresso.name = u8"Espresso";
     espresso.background = {23, 18, 18, 255};
     espresso.text = {202, 176, 155, 255};
     espresso.cursor = {255, 185, 56, 255};
@@ -46,7 +46,7 @@ void Context::load() {
     this->themes.push_back(espresso);
 
     Theme catppuccin;
-    catppuccin.name = "Catppuccin";
+    catppuccin.name = u8"Catppuccin";
     catppuccin.background = {27, 25, 35, 255};
     catppuccin.text = {198, 160, 246, 255};
     catppuccin.cursor = {166, 218, 149, 255};
@@ -56,7 +56,7 @@ void Context::load() {
     this->themes.push_back(catppuccin);
 
     Theme cyberpunk;
-    cyberpunk.name = "Cyberpunk";
+    cyberpunk.name = u8"Cyberpunk";
     cyberpunk.background = {13, 13, 13, 255};
     cyberpunk.text = {84, 84, 84, 255};
     cyberpunk.cursor = {208, 237, 87, 255};
@@ -66,7 +66,7 @@ void Context::load() {
     this->themes.push_back(cyberpunk);
 
     Theme material;
-    material.name = "Material";
+    material.name = u8"Material";
     material.background = {33, 33, 33, 255};
     material.text = {95 , 99, 99, 255};
     material.cursor = {199, 146, 234, 255};
@@ -77,51 +77,46 @@ void Context::load() {
 
     std::string base = GetApplicationDirectory();
 
+    int codepoint_count = 0x7F + 0x6F;
+    int codepoints[codepoint_count] = { 0 };
+    for (int i = 0; i < 0x7F; i++) codepoints[i] = i; // Basic Latin block
+    for (int i = 0; i < 0x6F; i++) codepoints[0x7F + i] = 0x590 + i; // Hebrew block
+
     // Load fonts
     this->fonts.typingTestFont.size = 32;
-    this->fonts.typingTestFont.font = LoadFontEx((base+"assets/fonts/JetBrainsMono-Regular.ttf").c_str(),
-            this->fonts.typingTestFont.size, nullptr, 0);
+    this->fonts.typingTestFont.font = LoadFontEx((base+"assets/fonts/Cousine-Regular.ttf").c_str(),
+            this->fonts.typingTestFont.size, codepoints, codepoint_count);
     this->fonts.titleFont.size = 40;
-    this->fonts.titleFont.font = LoadFontEx((base+"assets/fonts/LexendDeca-Regular.ttf").c_str(),
-            this->fonts.titleFont.size, nullptr, 0);
+    this->fonts.titleFont.font = LoadFontEx((base+"assets/fonts/NotoSansHebrew-Regular.ttf").c_str(),
+            this->fonts.titleFont.size, codepoints, codepoint_count);
     this->fonts.tinyFont.size = 18;
-    this->fonts.tinyFont.font = LoadFontEx((base+"assets/fonts/JetBrainsMono-Regular.ttf").c_str(),
-            this->fonts.tinyFont.size, nullptr, 0);
+    this->fonts.tinyFont.font = LoadFontEx((base+"assets/fonts/Cousine-Regular.ttf").c_str(),
+            this->fonts.tinyFont.size, codepoints, codepoint_count);
     this->fonts.bigFont.size = 90;
-    this->fonts.bigFont.font = LoadFontEx((base+"assets/fonts/JetBrainsMono-Regular.ttf").c_str(),
-            this->fonts.bigFont.size, nullptr, 0);
+    this->fonts.bigFont.font = LoadFontEx((base+"assets/fonts/Cousine-Regular.ttf").c_str(),
+            this->fonts.bigFont.size, codepoints, codepoint_count);
 
 
     // Load word lists
-    int numberOfFiles;
-    char **files = GetDirectoryFiles((base+"assets/word_lists/").c_str(), &numberOfFiles);
+    FilePathList filesList = LoadDirectoryFiles((base+"assets/word_lists/").c_str());
+    char **files = filesList.paths;
+    int numberOfFiles = filesList.count;
 
     for (int i = numberOfFiles-1; i > -1; i--) {
         if (files[i][0] != '.') {
             WordList wordList;
             std::string name = files[i];
-            name.replace(name.find(".txt"), sizeof(".txt") - 1, "");
-            name.replace(name.find("_"), sizeof("_") - 1, " ");
+            name.replace(name.find(u8".txt"), sizeof(u8".txt") - 1, u8"");
+            name.replace(name.find('_'), sizeof('_') - 1, u8" ");
             name[0] = toupper(name[0]);
             wordList.name = name;
-            getFileContent((base+"assets/word_lists/"+files[i]).c_str(), wordList.words);
+            getFileContent(files[i], wordList.words);
             this->wordsLists.push_back(wordList);
         }
     }
 
     this->selectedTheme = loadStorageValue(0, 0);
-    this->selectedWordList = loadStorageValue(1, -1);
-    if (this->selectedWordList == -1) {
-        int index;
-
-        for (int i = 0; i < this->wordsLists.size(); i++) {
-            if (this->wordsLists[i].name == "English 200") {
-                index = i;
-                break;
-            }
-        }
-        this->selectedWordList = index;
-    }
+    this->selectedWordList = loadStorageValue(1, 0);
 
     // Load sounds
     this->sounds.clickSound1 = LoadSound((base+"assets/audio/otemu_browns.wav").c_str());

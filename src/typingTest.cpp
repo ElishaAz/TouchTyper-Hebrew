@@ -3,6 +3,9 @@
 #include "typingTest.hpp"
 #include <vector>
 #include <cmath>
+#include <codecvt>
+#include <cstring>
+#include <locale>
 #include "../libs/raylib/src/raymath.h"
 #include "constants.hpp"
 
@@ -15,7 +18,14 @@ float cursorOpacity = 1;
 int cursorOpacityDirection = 0;
 float cursorStayVisibleTimer = 0;
 
-std::vector<std::vector<char>> keyboard = {
+std::vector<std::vector<std::string>> keyboard_chars = {
+    {u8"/", u8"'", u8"ק", u8"ר", u8"א", u8"ט", u8"ו", u8"ן", u8"ם", u8"פ", u8"]", u8"["},
+    {u8"ש", u8"ד", u8"ג", u8"כ", u8"ע", u8"י", u8"ח", u8"ל", u8"ך", u8"ף", u8","},
+    {u8"ז", u8"ס", u8"ב", u8"ה", u8"נ", u8"מ", u8"צ", u8"ת", u8"ץ", u8"."},
+    {u8" "}
+};
+
+std::vector<std::vector<char>> keyboard_keys = {
     {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[',']'},
     {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';','\''},
     {'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/'},
@@ -60,9 +70,9 @@ void typingTest(Context &context) {
     cursorOpacity = sinPulse(1.5);
 
     // Calculate how many words will be in each line according to the available screen size
-    std::vector<std::string> lines;
-    std::string currentLine = "";
-    std::string currentWord = "";
+    std::vector<std::u32string> lines;
+    std::u32string currentLine = U"";
+    std::u32string currentWord = U"";
 
     for (int i = 0; i < context.sentence.size(); i++) {
         // Detect the end of a word
@@ -77,11 +87,11 @@ void typingTest(Context &context) {
             // Go to new line if word is overflowing
             if (widthOfNewLine > width-(PADDING*2)) {
                 lines.push_back(currentLine);
-                currentLine = "";
+                currentLine = U"";
             }
 
             currentLine += currentWord;
-            currentWord = "";
+            currentWord = U"";
         } else {
             currentWord.push_back(context.sentence[i]);
         }
@@ -112,7 +122,7 @@ void typingTest(Context &context) {
 
         float currentLetterX = center.x - (widthOfLine/2);
 
-        for (char& letter : line) {
+        for (const char32_t& letter : line) {
             Color color = theme.text;
 
             if (context.input.size() > characterIndex) {
@@ -124,7 +134,7 @@ void typingTest(Context &context) {
 
                     // Draw underline if space
                     if (letter == ' ') {
-                        DrawTextEx(context.fonts.typingTestFont.font, "_",
+                        DrawTextEx(context.fonts.typingTestFont.font, u8"_",
                                 {currentLetterX, currentLineY}, context.fonts.typingTestFont.size,
                                 1, color);
 
@@ -133,7 +143,7 @@ void typingTest(Context &context) {
             }
 
             // Draw Text
-            DrawTextEx(context.fonts.typingTestFont.font, std::string(1, letter).c_str(),
+            DrawTextEx(context.fonts.typingTestFont.font, converter.to_bytes(std::u32string(1, letter)).c_str(),
                     {currentLetterX, currentLineY}, context.fonts.typingTestFont.size,
                     1, color);
 
@@ -194,27 +204,28 @@ void typingTest(Context &context) {
         cursorStayVisibleTimer = 1;
     }
 
-    for (int i = 0; i < keyboard.size(); i++) {
-        auto row = keyboard[i];
-        int totalWidth = row[0] == ' ' ? 200 : (sizeOfKey * row.size()) + margin * (row.size()-1);
+    for (int i = 0; i < keyboard_chars.size(); i++) {
+        auto row = keyboard_chars[i];
+        int totalWidth = row[0] == u8" " ? 200 : (sizeOfKey * row.size()) + margin * (row.size()-1);
         Vector2 position;
         position.x = center.x - (totalWidth/2.0);
         position.y = (textBox.y + (sizeOfCharacter.y * 8)) + (sizeOfKey * i) + margin * i;
 
-        for (auto key : row) {
-            std::string c(1, key);
+        for (int j = 0; j < row.size(); j++) {
+            auto const key_char = &row[j];
+            auto key_key = keyboard_keys[i][j];
             Rectangle rect;
             rect.x = position.x;
             rect.y = position.y;
-            rect.width = row[0] == ' ' ? 200 : sizeOfKey;
+            rect.width = row[0] == u8" " ? 200 : sizeOfKey;
             rect.height = sizeOfKey;
-            DrawRectangleRoundedLines(rect, 0.1, 5, 1, theme.text);
+            DrawRectangleRoundedLines(rect, 0.1, 5, theme.text);
             Color color = theme.text;
             Vector2 keyPosition;
             keyPosition.x = (rect.x + (sizeOfKey/2.0)) - (sizeOfCharacter.x/2.0);
             keyPosition.y = (rect.y + (sizeOfKey/2.0)) - (sizeOfCharacter.y/2.0);
 
-            if (IsKeyDown(toupper(key))) {
+            if (IsKeyDown(toupper(key_key))) {
                 BeginBlendMode(BLEND_SUBTRACT_COLORS);
                 DrawRectangleRounded(rect, 0.1, 5, theme.cursor);
                 EndBlendMode();
@@ -222,7 +233,7 @@ void typingTest(Context &context) {
                 cursorStayVisibleTimer = 1;
             }
 
-            drawMonospaceText(context.fonts.tinyFont.font, c.c_str(), keyPosition, context.fonts.tinyFont.size, color);
+            drawMonospaceText(context.fonts.tinyFont.font, *key_char, keyPosition, context.fonts.tinyFont.size, color);
             position.x += sizeOfKey + margin;
         }
     }

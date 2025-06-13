@@ -98,7 +98,7 @@ void footer(Context &context) {
             theme.text);
 
     // Draw shortcut
-    std::string shortcut = "shift  +  enter  - repeat test";
+    std::string shortcut = u8"shift  +  enter  - repeat test";
     Vector2 position = center;
     position.y = context.screenHeight - (PADDING + sizeOfCharacter.y);
     position.x -= (sizeOfCharacter.x*shortcut.size())/2.0;
@@ -107,21 +107,21 @@ void footer(Context &context) {
     rec.y = position.y-2;
     rec.height = (sizeOfCharacter.y) + 4;
     rec.width = (sizeOfCharacter.x * 5) + 8;
-    drawMonospaceText(context.fonts.tinyFont.font, shortcut.c_str(), position, context.fonts.tinyFont.size, theme.text);
-    DrawRectangleRoundedLines(rec, 0.1, 5, 1, theme.text);
+    drawMonospaceText(context.fonts.tinyFont.font, shortcut, position, context.fonts.tinyFont.size, theme.text);
+    DrawRectangleRoundedLines(rec, 0.1, 5, theme.text);
     position.x += sizeOfCharacter.x * 10;
     rec.x = position.x-4;
     rec.width = (sizeOfCharacter.x * 5) + 8;
-    DrawRectangleRoundedLines(rec, 0.1, 5, 1, theme.text);
+    DrawRectangleRoundedLines(rec, 0.1, 5, theme.text);
 
-    shortcut = "enter  -  new test";
+    shortcut = u8"enter  -  new test";
     position.x  = getCenter(context.screenWidth, context.screenHeight).x - (sizeOfCharacter.x*shortcut.size())/2.0;
     position.y -= sizeOfCharacter.y + 10;
-    drawMonospaceText(context.fonts.tinyFont.font, shortcut.c_str(), position, context.fonts.tinyFont.size, theme.text);
+    drawMonospaceText(context.fonts.tinyFont.font, shortcut, position, context.fonts.tinyFont.size, theme.text);
     rec.x = position.x-4;
     rec.y = position.y-2;
     rec.width = (sizeOfCharacter.x * 5) + 8;
-    DrawRectangleRoundedLines(rec, 0.1, 5, 1, theme.text);
+    DrawRectangleRoundedLines(rec, 0.1, 5, theme.text);
 
     // Draw options
     Vector2 themePosition = {
@@ -143,7 +143,7 @@ void footer(Context &context) {
         }
     }
 
-    if (textButton(context, themePosition, "theme")) {
+    if (textButton(context, themePosition, u8"theme")) {
         showThemesOptions = !showThemesOptions;
     } else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         showThemesOptions = false;
@@ -170,7 +170,7 @@ void footer(Context &context) {
         }
     }
 
-    if (textButton(context, worldlistPosition, "word list")) {
+    if (textButton(context, worldlistPosition, u8"word list")) {
         showWordListOptions = !showWordListOptions;
     } else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
         showWordListOptions = false;
@@ -182,7 +182,7 @@ void footer(Context &context) {
     };
 
     if (showCursorOptions) {
-        std::vector<std::string> cursorOptions = {"Block", "Line", "Underline"};
+        std::vector<std::string> cursorOptions = {u8"Block", u8"Line", u8"Underline"};
         int selected = optionSelect(context, cursorOptions, (int)context.cursorStyle);
 
         if (selected != -1) {
@@ -190,7 +190,7 @@ void footer(Context &context) {
         }
     }
 
-    if (textButton(context, cursorPosition, "cursor")) {
+    if (textButton(context, cursorPosition, u8"cursor")) {
         showCursorOptions = !showCursorOptions;
     } else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         showCursorOptions = false;
@@ -201,7 +201,7 @@ void footer(Context &context) {
             cursorPosition.y
     };
 
-    if (textButton(context, soundPosition, context.soundOn ? "sound on" : "sound off")) {
+    if (textButton(context, soundPosition, context.soundOn ? u8"sound on" : u8"sound off")) {
         context.soundOn = !context.soundOn;
     }
 }

@@ -5,8 +5,8 @@
 #include <vector>
 #include "../libs/raylib/src/raymath.h"
 
-std::vector<std::string> firstOptions = {"numbers", "punctuation"};
-std::vector<std::string> secondOptions = {"words", "time"};
+std::vector<std::string> firstOptions = {u8"numbers", u8"punctuation"};
+std::vector<std::string> secondOptions = {u8"words", u8"time"};
 float targetBarHeight = 0;
 float barHeight = 0;
 
@@ -89,10 +89,10 @@ void header(Context &context) {
         color = theme.correct;
         switch (context.currentScreen) {
             case Screen::TEST:
-                text = "start typing";
+                text = u8"start typing";
                 break;
             case Screen::RESULT:
-                text = "result";
+                text = u8"result";
                 break;
         }
     } else {
@@ -127,7 +127,7 @@ void header(Context &context) {
 
     std::vector<std::string> thirdOptions;
     for (auto option : context.testSettings.testModeAmounts) {
-        thirdOptions.push_back(std::to_string(option));
+        std::to_string(option);
     }
 
     options(context, thirdOptions, startingPosition, sizeOfCharacter, true);

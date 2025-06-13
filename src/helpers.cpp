@@ -1,7 +1,10 @@
 #include "helpers.hpp"
 #include <cctype>
+#include <cstring>
 #include <unordered_map>
 #include "Context.hpp"
+
+std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
 
 Vector2 getCenter(int width, int height) {
     Vector2 result;
@@ -13,11 +16,28 @@ Vector2 getCenter(int width, int height) {
 void drawMonospaceText(Font font, std::string text, Vector2 position, float fontSize, Color color) {
     Vector2 sizeOfCharacter = MeasureTextEx(font, "a", fontSize, 1);
 
-    for (auto letter : text) {
-        std::string c(1, letter);
+    for (int i = 0; i < text.size(); ++i)
+    {
+        unsigned char lb = text[i];
+        char buf[5] = {0,0,0,0,0};
 
-        DrawTextEx(font, c.c_str(), position, fontSize, 1, color);
+        int len = 0;
+
+        if ((lb & 0x80) == 0) // lead bit is zero, must be a single ascii
+            len = 1;
+        else if ((lb & 0xE0) == 0xC0) // 110x xxxx
+            len = 2;
+        else if ((lb & 0xF0) == 0xE0) // 1110 xxxx
+            len = 3;
+        else if ((lb & 0xF8) == 0xF0) // 1111 0xxx
+            len = 4;
+        else
+            continue;
+        memcpy(buf, &text[i], len);
+
+        DrawTextEx(font, buf, position, fontSize, 1, color);
         position.x += sizeOfCharacter.x;
+        i += len - 1;
     }
 }
 
@@ -70,41 +90,16 @@ char quotes[3][2] = {
     {'(', ')'}
 };
 
-std::unordered_map<std::string, std::string> punctuations = {
-    {"are", "aren't"},
-    {"can", "can't"},
-    {"could", "couldn't"},
-    {"did", "didn't"},
-    {"does", "doesn't"},
-    {"do", "don't"},
-    {"had", "hadn't"},
-    {"has", "hasn't"},
-    {"have", "haven't"},
-    {"is", "isn't"},
-    {"must", "mustn't"},
-    {"should", "shouldn't"},
-    {"was", "wasn't"},
-    {"were", "weren't"},
-    {"will", "won't"},
-    {"would", "wouldn't"}
-};
-
-std::string generateSentence(Context &context, int numberOfWords) {
+std::u32string generateSentence(Context &context, int numberOfWords) {
     auto words = context.wordsLists[context.selectedWordList].words;
-    std::string output = "";
+    std::u32string output = U"";
 
     // Shuffle the amount of words we need
     random_unique(words.begin(), words.end(), numberOfWords);
 
     // Put the words in the senctence
     for(int i = 0; i < numberOfWords; ++i) {
-        std::string word = words[i];
-
-        if (context.testSettings.usePunctuation) {
-            if (punctuations.find(word) != punctuations.end()) {
-                word = punctuations[word];
-            }
-        }
+        std::u32string word = words[i];
 
         bool inQuotes = context.testSettings.usePunctuation && (GetRandomValue(0, 10) == 10);
         bool itsDashTime = context.testSettings.usePunctuation && (GetRandomValue(0, 10) == 10) && !previousWasDash && !useCaplitalNext;
@@ -119,11 +114,11 @@ std::string generateSentence(Context &context, int numberOfWords) {
             output.push_back(quotes[quote][0]);
             word += quotes[quote][1];
         } else if(itsDashTime) {
-            word = "-";
+            word = U"-";
         }
 
         if (itsNumber) {
-            word = std::to_string(GetRandomValue(0, 1000));
+            word = converter.from_bytes(std::to_string(GetRandomValue(0, 1000)));
         }
 
         output += word;
@@ -157,7 +152,7 @@ std::string generateSentence(Context &context, int numberOfWords) {
 
         previousWasDash = itsDashTime;
 
-        output += ' ';
+        output += U' ';
     }
 
     output.pop_back();
@@ -184,7 +179,7 @@ void restartTest(Context &context, bool repeat) {
         }
     }
 
-    context.input = "";
+    context.input = U"";
     context.currentScreen = Screen::TEST;
     context.wpm = 0;
     context.cpm = 0;
@@ -202,7 +197,7 @@ void endTest(Context &context) {
     context.testEndTime = GetTime();
 }
 
-bool getFileContent(std::string fileName, std::vector<std::string> & vecOfStrs) {
+bool getFileContent(std::string fileName, std::vector<std::u32string> & vecOfStrs) {
     // Open the File
     std::ifstream in(fileName.c_str());
 
@@ -213,11 +208,11 @@ bool getFileContent(std::string fileName, std::vector<std::string> & vecOfStrs) 
     }
 
     std::string str;
-    // Read the next line from File untill it reaches the end.
+    // Read the next line from File until it reaches the end.
     while (std::getline(in, str)) {
         // Line contains string of length > 0 then save it in vector
-        if(str.size() > 0)
-            vecOfStrs.push_back(str);
+        if(!str.empty())
+            vecOfStrs.push_back(converter.from_bytes(str));
     }
 
     //Close The File
@@ -252,7 +247,7 @@ bool saveStorageValue(unsigned int position, int value) {
     return true;
 #endif
     bool success = false;
-    unsigned int dataSize = 0;
+    int dataSize = 0;
     unsigned int newDataSize = 0;
     const char *filePath = TextFormat("%s%s", GetApplicationDirectory(), STORAGE_DATA_FILE);
     unsigned char *fileData = LoadFileData(filePath, &dataSize);
@@ -315,7 +310,7 @@ int loadStorageValue(unsigned int position, int defaultValue) {
     return getStorageBrowser(position);
 #endif
     int value = defaultValue;
-    unsigned int dataSize = 0;
+    int dataSize = 0;
     const char *filePath = TextFormat("%s%s", GetApplicationDirectory(), STORAGE_DATA_FILE);
     unsigned char *fileData = LoadFileData(filePath, &dataSize);
 

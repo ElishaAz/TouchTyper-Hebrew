@@ -2,7 +2,7 @@
 #define CONSTANTS
 
 #ifndef PROJECT_NAME
-#define PROJECT_NAME "UwU"
+#define PROJECT_NAME "Uwu8"
 #endif
 
 #ifndef VERSION

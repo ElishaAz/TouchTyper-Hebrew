@@ -36,7 +36,7 @@ struct Theme {
 
 struct WordList {
     std::string name;
-    std::vector<std::string> words;
+    std::vector<std::u32string> words;
 };
 
 enum class TestMode { TIME = 0, WORDS };
@@ -57,8 +57,8 @@ struct Context {
     Sounds sounds;
     std::vector<WordList> wordsLists;
     int selectedWordList = 0;
-    std::string sentence;
-    std::string input;
+    std::u32string sentence;
+    std::u32string input;
     double testStartTime = 0;
     bool testRunning = false;
     double testEndTime = 0;

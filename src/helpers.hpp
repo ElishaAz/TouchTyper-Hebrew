@@ -7,6 +7,8 @@
 #include <fstream>
 #include <iostream>
 #include <stdlib.h>
+#include <locale>
+#include <codecvt>
 
 #define STORAGE_DATA_FILE "storage.data"
 
@@ -32,8 +34,10 @@ void restartTest(Context &context, bool repeat);
 
 void endTest(Context &context);
 
-bool getFileContent(std::string fileName, std::vector<std::string> & vecOfStrs);
+bool getFileContent(std::string fileName, std::vector<std::u32string> & vecOfStrs);
 
-std::string generateSentence(Context &context, int words);
+std::u32string generateSentence(Context &context, int words);
+
+extern std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
 
 #endif
