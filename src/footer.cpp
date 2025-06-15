@@ -12,18 +12,19 @@ bool showThemesOptions = false;
 bool showWordListOptions = false;
 bool showCursorOptions = false;
 
-int optionSelect(Context &context, std::vector<std::string> &options, int selected) {
+int optionSelect(Context& context, std::vector<std::string>& options, int selected)
+{
     Vector2 sizeOfCharacter = MeasureTextEx(context.fonts.tinyFont.font, "a",
-            context.fonts.tinyFont.size, 1);
+                                            context.fonts.tinyFont.size, 1);
 
     Theme theme = context.themes[context.selectedTheme];
-    int height = options.size() * (sizeOfCharacter.y+(optionPadding * 2));
+    int height = options.size() * (sizeOfCharacter.y + (optionPadding * 2));
     Vector2 center = getCenter(context.screenWidth, context.screenHeight);
     Rectangle rect;
-    rect.height = height + (optionsContainerPadding*2);
+    rect.height = height + (optionsContainerPadding * 2);
     rect.width = optionSelectWidth;
-    rect.x = center.x - (rect.width/2.0);
-    rect.y = center.y - (rect.height/2.0);
+    rect.x = center.x - (rect.width / 2.0);
+    rect.y = center.y - (rect.height / 2.0);
 
     DrawRectangle(0, 0, context.screenWidth, context.screenHeight, {0, 0, 0, 100});
     DrawRectangleRec(rect, theme.background);
@@ -31,25 +32,29 @@ int optionSelect(Context &context, std::vector<std::string> &options, int select
     startingPosition.x = rect.x + optionsContainerPadding;
     startingPosition.y = rect.y + optionsContainerPadding;
 
-    for (int i = 0; i < options.size(); i++) {
+    for (int i = 0; i < options.size(); i++)
+    {
         auto option = options[i];
         Rectangle optionRect;
         optionRect.x = startingPosition.x - optionsContainerPadding;
         optionRect.y = startingPosition.y;
         optionRect.width = rect.width;
-        optionRect.height = sizeOfCharacter.y + (optionPadding*2);
+        optionRect.height = sizeOfCharacter.y + (optionPadding * 2);
         Color color = theme.text;
 
         bool mouseOnOption = CheckCollisionPointRec(GetMousePosition(), optionRect);
 
-        if (mouseOnOption) {
+        if (mouseOnOption)
+        {
             context.mouseOnClickable = true;
-            if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+            if (IsMouseButtonDown(MOUSE_LEFT_BUTTON))
+            {
                 return i;
             }
         }
 
-        if (i == selected || mouseOnOption) {
+        if (i == selected || mouseOnOption)
+        {
             BeginBlendMode(BLEND_SUBTRACT_COLORS);
             DrawRectangleRec(optionRect, theme.cursor);
             EndBlendMode();
@@ -68,23 +73,24 @@ int optionSelect(Context &context, std::vector<std::string> &options, int select
 }
 
 
-void footer(Context &context) {
+void footer(Context& context)
+{
     Vector2 sizeOfCharacter = MeasureTextEx(context.fonts.tinyFont.font, "a",
-            context.fonts.tinyFont.size, 1);
+                                            context.fonts.tinyFont.size, 1);
     Theme theme = context.themes[context.selectedTheme];
 
-    int width = std::min(context.screenWidth-(PADDING*2), MAX_WIDTH);
+    int width = std::min(context.screenWidth - (PADDING * 2), MAX_WIDTH);
 
     // Center of the screen
     Vector2 center = getCenter(context.screenWidth, context.screenHeight);
 
     Vector2 bottomLeftPosition;
-    bottomLeftPosition.x = center.x - width/2.0;
-    bottomLeftPosition.y = context.screenHeight-PADDING;
+    bottomLeftPosition.x = center.x - width / 2.0;
+    bottomLeftPosition.y = context.screenHeight - PADDING;
 
     Vector2 bottomRightPosition;
-    bottomRightPosition.x = center.x + width/2.0;
-    bottomRightPosition.y = context.screenHeight-PADDING;
+    bottomRightPosition.x = center.x + width / 2.0;
+    bottomRightPosition.y = context.screenHeight - PADDING;
 
     Vector2 versionPosition = bottomRightPosition;
     versionPosition.y -= sizeOfCharacter.y;
@@ -92,34 +98,34 @@ void footer(Context &context) {
 
     // Draw version
     drawMonospaceText(context.fonts.tinyFont.font,
-            VERSION,
-            versionPosition,
-            context.fonts.tinyFont.size,
-            theme.text);
+                      VERSION,
+                      versionPosition,
+                      context.fonts.tinyFont.size,
+                      theme.text);
 
     // Draw shortcut
     std::string shortcut = u8"shift  +  enter  - repeat test";
     Vector2 position = center;
     position.y = context.screenHeight - (PADDING + sizeOfCharacter.y);
-    position.x -= (sizeOfCharacter.x*shortcut.size())/2.0;
+    position.x -= (sizeOfCharacter.x * shortcut.size()) / 2.0;
     Rectangle rec;
-    rec.x = position.x-4;
-    rec.y = position.y-2;
+    rec.x = position.x - 4;
+    rec.y = position.y - 2;
     rec.height = (sizeOfCharacter.y) + 4;
     rec.width = (sizeOfCharacter.x * 5) + 8;
     drawMonospaceText(context.fonts.tinyFont.font, shortcut, position, context.fonts.tinyFont.size, theme.text);
     DrawRectangleRoundedLines(rec, 0.1, 5, theme.text);
     position.x += sizeOfCharacter.x * 10;
-    rec.x = position.x-4;
+    rec.x = position.x - 4;
     rec.width = (sizeOfCharacter.x * 5) + 8;
     DrawRectangleRoundedLines(rec, 0.1, 5, theme.text);
 
     shortcut = u8"enter  -  new test";
-    position.x  = getCenter(context.screenWidth, context.screenHeight).x - (sizeOfCharacter.x*shortcut.size())/2.0;
+    position.x = getCenter(context.screenWidth, context.screenHeight).x - (sizeOfCharacter.x * shortcut.size()) / 2.0;
     position.y -= sizeOfCharacter.y + 10;
     drawMonospaceText(context.fonts.tinyFont.font, shortcut, position, context.fonts.tinyFont.size, theme.text);
-    rec.x = position.x-4;
-    rec.y = position.y-2;
+    rec.x = position.x - 4;
+    rec.y = position.y - 2;
     rec.width = (sizeOfCharacter.x * 5) + 8;
     DrawRectangleRoundedLines(rec, 0.1, 5, theme.text);
 
@@ -129,23 +135,29 @@ void footer(Context &context) {
         bottomRightPosition.y - sizeOfCharacter.y
     };
 
-    if (showThemesOptions)  {
+    if (showThemesOptions)
+    {
         std::vector<std::string> themeOptions;
-        for (auto theme : context.themes) {
+        for (auto theme : context.themes)
+        {
             themeOptions.push_back(theme.name);
         }
 
         int selected = optionSelect(context, themeOptions, context.selectedTheme);
 
-        if (selected != -1) {
+        if (selected != -1)
+        {
             context.selectedTheme = selected;
             showThemesOptions = false;
         }
     }
 
-    if (textButton(context, themePosition, u8"theme")) {
+    if (textButton(context, themePosition, u8"theme"))
+    {
         showThemesOptions = !showThemesOptions;
-    } else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+    }
+    else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+    {
         showThemesOptions = false;
     }
 
@@ -154,25 +166,31 @@ void footer(Context &context) {
         themePosition.y
     };
 
-    if (showWordListOptions)  {
+    if (showWordListOptions)
+    {
         std::vector<std::string> wordListOptions;
 
-        for (auto wordList : context.wordsLists) {
+        for (auto wordList : context.wordsLists)
+        {
             wordListOptions.push_back(wordList.name);
         }
 
         int selected = optionSelect(context, wordListOptions, context.selectedWordList);
 
-        if (selected != -1) {
+        if (selected != -1)
+        {
             context.selectedWordList = selected;
             showWordListOptions = false;
             restartTest(context, false);
         }
     }
 
-    if (textButton(context, worldlistPosition, u8"word list")) {
+    if (textButton(context, worldlistPosition, u8"word list"))
+    {
         showWordListOptions = !showWordListOptions;
-    } else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+    }
+    else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+    {
         showWordListOptions = false;
     }
 
@@ -181,27 +199,33 @@ void footer(Context &context) {
         bottomRightPosition.y - sizeOfCharacter.y
     };
 
-    if (showCursorOptions) {
+    if (showCursorOptions)
+    {
         std::vector<std::string> cursorOptions = {u8"Block", u8"Line", u8"Underline"};
         int selected = optionSelect(context, cursorOptions, (int)context.cursorStyle);
 
-        if (selected != -1) {
+        if (selected != -1)
+        {
             context.cursorStyle = (CursorStyle)selected;
         }
     }
 
-    if (textButton(context, cursorPosition, u8"cursor")) {
+    if (textButton(context, cursorPosition, u8"cursor"))
+    {
         showCursorOptions = !showCursorOptions;
-    } else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+    }
+    else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+    {
         showCursorOptions = false;
     }
 
-    Vector2 soundPosition {
+    Vector2 soundPosition{
         cursorPosition.x - sizeOfCharacter.x * (context.soundOn ? 9 : 10),
-            cursorPosition.y
+        cursorPosition.y
     };
 
-    if (textButton(context, soundPosition, context.soundOn ? u8"sound on" : u8"sound off")) {
+    if (textButton(context, soundPosition, context.soundOn ? u8"sound on" : u8"sound off"))
+    {
         context.soundOn = !context.soundOn;
     }
 }

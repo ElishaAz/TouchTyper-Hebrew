@@ -26,26 +26,28 @@ std::vector<std::vector<std::string>> keyboard_chars = {
 };
 
 std::vector<std::vector<char>> keyboard_keys = {
-    {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[',']'},
-    {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';','\''},
+    {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']'},
+    {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\''},
     {'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/'},
     {' '}
 };
 
-float sinPulse(float frequency) {
+float sinPulse(float frequency)
+{
     const float pi = 3.14f;
     return 0.5f * (1 + (float)std::sin(2 * pi * frequency * GetTime()));
 }
 
-void typingTest(Context &context) {
+void typingTest(Context& context)
+{
     // We are using a monospace font so every character will have same with
     Vector2 sizeOfCharacter = MeasureTextEx(context.fonts.typingTestFont.font, "a",
-            context.fonts.typingTestFont.size, 1);
+                                            context.fonts.typingTestFont.size, 1);
 
     Theme theme = context.themes[context.selectedTheme];
 
     // To make it responsive
-    float width = std::min(context.screenWidth-(PADDING*2), MAX_WIDTH);
+    float width = std::min(context.screenWidth - (PADDING * 2), MAX_WIDTH);
     float height = sizeOfCharacter.y * 3;
 
     // Center of the screen
@@ -60,9 +62,12 @@ void typingTest(Context &context) {
     cursorPostion.y = Lerp(cursorPostion.y, newCursorPosition.y, (speed <= 0 || speed > 1) ? 1 : speed);
 
     // Cursor blink timer
-    if (cursorStayVisibleTimer > 0) {
+    if (cursorStayVisibleTimer > 0)
+    {
         cursorStayVisibleTimer -= GetFrameTime();
-    } else {
+    }
+    else
+    {
         cursorStayVisibleTimer = 0;
     }
 
@@ -74,9 +79,11 @@ void typingTest(Context &context) {
     std::u32string currentLine = U"";
     std::u32string currentWord = U"";
 
-    for (int i = 0; i < context.sentence.size(); i++) {
+    for (int i = 0; i < context.sentence.size(); i++)
+    {
         // Detect the end of a word
-        if (context.sentence[i] == ' ' || i == (context.sentence.size() - 1)) {
+        if (context.sentence[i] == ' ' || i == (context.sentence.size() - 1))
+        {
             currentWord += context.sentence[i];
 
             // Calculate the width of the word
@@ -85,14 +92,17 @@ void typingTest(Context &context) {
             float widthOfNewLine = widthOfWord + currentLine.size() * sizeOfCharacter.x;
 
             // Go to new line if word is overflowing
-            if (widthOfNewLine > width-(PADDING*2)) {
+            if (widthOfNewLine > width - (PADDING * 2))
+            {
                 lines.push_back(currentLine);
                 currentLine = U"";
             }
 
             currentLine += currentWord;
             currentWord = U"";
-        } else {
+        }
+        else
+        {
             currentWord.push_back(context.sentence[i]);
         }
     }
@@ -100,13 +110,14 @@ void typingTest(Context &context) {
     lines.push_back(currentLine);
 
     Rectangle textBox = {
-        (float)(center.x - width/2.0),
-        (float)((center.y - height/2.0) - 100),
+        (float)(center.x - width / 2.0),
+        (float)((center.y - height / 2.0) - 100),
         (float)width,
         (float)(height > 1 ? height : 1), // To fix a bug in Secissor Mode when it crashes when the height is < 1
     };
 
-    if (textBox.y < 95) {
+    if (textBox.y < 95)
+    {
         textBox.y = 95;
     }
 
@@ -117,30 +128,36 @@ void typingTest(Context &context) {
     int characterIndex = 0;
     int lineNumber = 1;
 
-    for (auto& line : lines) {
+    for (auto& line : lines)
+    {
         float widthOfLine = sizeOfCharacter.x * line.size();
 
-        float currentLetterX = center.x + (widthOfLine/2);
+        float currentLetterX = center.x + (widthOfLine / 2);
 
-        for (const char32_t& letter : line) {
+        for (const char32_t& letter : line)
+        {
             Color color = theme.text;
             bool correct = true;
 
-            if (context.input.size() > characterIndex) {
+            if (context.input.size() > characterIndex)
+            {
                 correct = letter == context.input[characterIndex];
 
                 // Check if the character is wrong
-                if (letter == context.input[characterIndex]) {
+                if (letter == context.input[characterIndex])
+                {
                     color = theme.correct;
-                } else {
+                }
+                else
+                {
                     color = theme.wrong;
 
                     // Draw underline if space
-                    if (context.input[characterIndex] == ' ') {
+                    if (context.input[characterIndex] == ' ')
+                    {
                         DrawTextEx(context.fonts.typingTestFont.font, u8"_",
-                                {currentLetterX, currentLineY}, context.fonts.typingTestFont.size,
-                                1, color);
-
+                                   {currentLetterX, currentLineY}, context.fonts.typingTestFont.size,
+                                   1, color);
                     }
                 }
             }
@@ -149,41 +166,44 @@ void typingTest(Context &context) {
 
             // Draw Text
             DrawTextEx(context.fonts.typingTestFont.font, converter.to_bytes(std::u32string(1, shown_letter)).c_str(),
-                    {currentLetterX, currentLineY}, context.fonts.typingTestFont.size,
-                    1, color);
+                       {currentLetterX, currentLineY}, context.fonts.typingTestFont.size,
+                       1, color);
 
             // Handle cursor
-            if (characterIndex == context.input.size()) {
+            if (characterIndex == context.input.size())
+            {
                 // Set the offset to make the cursor at center
-                newYOffset = lineNumber > 2 ? ((lineNumber-1) * sizeOfCharacter.y) - sizeOfCharacter.y : 1;
-                newCursorPosition = { currentLetterX, currentLineY };
+                newYOffset = lineNumber > 2 ? ((lineNumber - 1) * sizeOfCharacter.y) - sizeOfCharacter.y : 1;
+                newCursorPosition = {currentLetterX, currentLineY};
 
                 Color cursorColor = theme.cursor;
-                float blink = (cursorStayVisibleTimer != 0 )? 1 : cursorOpacity;
+                float blink = (cursorStayVisibleTimer != 0) ? 1 : cursorOpacity;
 
                 // Draw Cursor
-                if (blink > 0.5) {
+                if (blink > 0.5)
+                {
                     BeginBlendMode(BLEND_SUBTRACT_COLORS);
-                    switch (context.cursorStyle) {
-                        case CursorStyle::BLOCK:
-                            DrawRectangle(cursorPostion.x+1, cursorPostion.y,
-                                    sizeOfCharacter.x, sizeOfCharacter.y,
-                                    cursorColor);
-                            // Make the color of the text inverted
-                            //color = theme.background;
+                    switch (context.cursorStyle)
+                    {
+                    case CursorStyle::BLOCK:
+                        DrawRectangle(cursorPostion.x + 1, cursorPostion.y,
+                                      sizeOfCharacter.x, sizeOfCharacter.y,
+                                      cursorColor);
+                        // Make the color of the text inverted
+                        //color = theme.background;
 
-                            break;
-                        case CursorStyle::LINE:
-                            DrawRectangle(cursorPostion.x, cursorPostion.y,
-                                    2, sizeOfCharacter.y,
-                                    cursorColor);
+                        break;
+                    case CursorStyle::LINE:
+                        DrawRectangle(cursorPostion.x, cursorPostion.y,
+                                      2, sizeOfCharacter.y,
+                                      cursorColor);
 
-                            break;
-                        case CursorStyle::UNDERLINE:
-                            DrawRectangle(cursorPostion.x+1, cursorPostion.y+sizeOfCharacter.y,
-                                    sizeOfCharacter.x, 3,
-                                    cursorColor);
-                            break;
+                        break;
+                    case CursorStyle::UNDERLINE:
+                        DrawRectangle(cursorPostion.x + 1, cursorPostion.y + sizeOfCharacter.y,
+                                      sizeOfCharacter.x, 3,
+                                      cursorColor);
+                        break;
                     }
                     EndBlendMode();
                 }
@@ -203,20 +223,23 @@ void typingTest(Context &context) {
     const int sizeOfKey = 35;
     const int margin = 5;
     sizeOfCharacter = MeasureTextEx(context.fonts.tinyFont.font, "a",
-            context.fonts.tinyFont.size, 1);
+                                    context.fonts.tinyFont.size, 1);
 
-    if (IsKeyPressed(KEY_BACKSPACE)) {
+    if (IsKeyPressed(KEY_BACKSPACE))
+    {
         cursorStayVisibleTimer = 1;
     }
 
-    for (int i = 0; i < keyboard_chars.size(); i++) {
+    for (int i = 0; i < keyboard_chars.size(); i++)
+    {
         auto row = keyboard_chars[i];
-        int totalWidth = row[0] == u8" " ? 200 : (sizeOfKey * row.size()) + margin * (row.size()-1);
+        int totalWidth = row[0] == u8" " ? 200 : (sizeOfKey * row.size()) + margin * (row.size() - 1);
         Vector2 position;
-        position.x = center.x - (totalWidth/2.0);
+        position.x = center.x - (totalWidth / 2.0);
         position.y = (textBox.y + (sizeOfCharacter.y * 8)) + (sizeOfKey * i) + margin * i;
 
-        for (int j = 0; j < row.size(); j++) {
+        for (int j = 0; j < row.size(); j++)
+        {
             auto const key_char = &row[j];
             auto key_key = keyboard_keys[i][j];
             Rectangle rect;
@@ -227,10 +250,11 @@ void typingTest(Context &context) {
             DrawRectangleRoundedLines(rect, 0.1, 5, theme.text);
             Color color = theme.text;
             Vector2 keyPosition;
-            keyPosition.x = (rect.x + (sizeOfKey/2.0)) - (sizeOfCharacter.x/2.0);
-            keyPosition.y = (rect.y + (sizeOfKey/2.0)) - (sizeOfCharacter.y/2.0);
+            keyPosition.x = (rect.x + (sizeOfKey / 2.0)) - (sizeOfCharacter.x / 2.0);
+            keyPosition.y = (rect.y + (sizeOfKey / 2.0)) - (sizeOfCharacter.y / 2.0);
 
-            if (IsKeyDown(toupper(key_key))) {
+            if (IsKeyDown(toupper(key_key)))
+            {
                 BeginBlendMode(BLEND_SUBTRACT_COLORS);
                 DrawRectangleRounded(rect, 0.1, 5, theme.cursor);
                 EndBlendMode();

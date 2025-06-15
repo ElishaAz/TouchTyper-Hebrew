@@ -6,14 +6,16 @@
 
 std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
 
-Vector2 getCenter(int width, int height) {
+Vector2 getCenter(int width, int height)
+{
     Vector2 result;
-    result.x = width/2.0;
-    result.y = height/2.0;
+    result.x = width / 2.0;
+    result.y = height / 2.0;
     return result;
 }
 
-void drawMonospaceText(Font font, std::string text, Vector2 position, float fontSize, Color color, const bool rtl) {
+void drawMonospaceText(Font font, std::string text, Vector2 position, float fontSize, Color color, const bool rtl)
+{
     Vector2 sizeOfCharacter = MeasureTextEx(font, "a", fontSize, 1);
 
     if (rtl)
@@ -24,7 +26,7 @@ void drawMonospaceText(Font font, std::string text, Vector2 position, float font
     for (int i = 0; i < text.size(); ++i)
     {
         unsigned char lb = text[i];
-        char buf[5] = {0,0,0,0,0};
+        char buf[5] = {0, 0, 0, 0, 0};
 
         int len = 0;
 
@@ -44,7 +46,8 @@ void drawMonospaceText(Font font, std::string text, Vector2 position, float font
         if (rtl)
         {
             position.x -= sizeOfCharacter.x;
-        } else
+        }
+        else
         {
             position.x += sizeOfCharacter.x;
         }
@@ -52,9 +55,10 @@ void drawMonospaceText(Font font, std::string text, Vector2 position, float font
     }
 }
 
-bool textButton(Context& context, Vector2 positon, std::string text) {
+bool textButton(Context& context, Vector2 positon, std::string text)
+{
     Vector2 sizeOfCharacter = MeasureTextEx(context.fonts.tinyFont.font, "a",
-            context.fonts.tinyFont.size, 1);
+                                            context.fonts.tinyFont.size, 1);
     Theme theme = context.themes[context.selectedTheme];
 
     Rectangle rect = {
@@ -66,10 +70,12 @@ bool textButton(Context& context, Vector2 positon, std::string text) {
 
     Color color = theme.text;
 
-    if (CheckCollisionPointRec(GetMousePosition(), rect)) {
-        context.mouseOnClickable  = true;
+    if (CheckCollisionPointRec(GetMousePosition(), rect))
+    {
+        context.mouseOnClickable = true;
         color = theme.highlight;
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+        {
             return true;
         }
     }
@@ -79,12 +85,14 @@ bool textButton(Context& context, Vector2 positon, std::string text) {
     return false;
 }
 
-template<class BidiIter>
-BidiIter random_unique(BidiIter begin, BidiIter end, size_t num_random) {
+template <class BidiIter>
+BidiIter random_unique(BidiIter begin, BidiIter end, size_t num_random)
+{
     size_t left = std::distance(begin, end);
-    while (num_random--) {
+    while (num_random--)
+    {
         BidiIter r = begin;
-        std::advance(r, rand()%left);
+        std::advance(r, rand() % left);
         std::swap(*begin, *r);
         ++begin;
         --left;
@@ -101,7 +109,8 @@ char quotes[3][2] = {
     {'(', ')'}
 };
 
-std::u32string generateSentence(Context &context, int numberOfWords) {
+std::u32string generateSentence(Context& context, int numberOfWords)
+{
     auto words = context.wordsLists[context.selectedWordList].words;
     std::u32string output = U"";
 
@@ -109,26 +118,33 @@ std::u32string generateSentence(Context &context, int numberOfWords) {
     random_unique(words.begin(), words.end(), numberOfWords);
 
     // Put the words in the senctence
-    for(int i = 0; i < numberOfWords; ++i) {
+    for (int i = 0; i < numberOfWords; ++i)
+    {
         std::u32string word = words[i];
 
         bool inQuotes = context.testSettings.usePunctuation && (GetRandomValue(0, 10) == 10);
-        bool itsDashTime = context.testSettings.usePunctuation && (GetRandomValue(0, 10) == 10) && !previousWasDash && !useCaplitalNext;
+        bool itsDashTime = context.testSettings.usePunctuation && (GetRandomValue(0, 10) == 10) && !previousWasDash && !
+            useCaplitalNext;
         bool itsNumber = context.testSettings.useNumbers && (GetRandomValue(0, 10) == 10);
 
-        if (useCaplitalNext) {
+        if (useCaplitalNext)
+        {
             word[0] = toupper(word[0]);
         }
 
-        if (inQuotes) {
+        if (inQuotes)
+        {
             int quote = GetRandomValue(0, 2);
             output.push_back(quotes[quote][0]);
             word += quotes[quote][1];
-        } else if(itsDashTime) {
+        }
+        else if (itsDashTime)
+        {
             word = U"-";
         }
 
-        if (itsNumber) {
+        if (itsNumber)
+        {
             word = converter.from_bytes(std::to_string(GetRandomValue(0, 1000)));
         }
 
@@ -138,26 +154,28 @@ std::u32string generateSentence(Context &context, int numberOfWords) {
 
         // Put . or , randomly
         if (GetRandomValue(0, 10) > 8 &&
-                context.testSettings.usePunctuation &&
-                !previousWasDash &&
-                !itsDashTime &&
-                !inQuotes) {
-            switch (GetRandomValue(0, 3)) {
-                case 0:
-                    output.push_back(',');
-                    break;
-                case 1:
-                    output.push_back('.');
-                    useCaplitalNext = true;
-                    break;
-                case 2:
-                    output.push_back('!');
-                    useCaplitalNext = true;
-                    break;
-                case 3:
-                    output.push_back('?');
-                    useCaplitalNext = true;
-                    break;
+            context.testSettings.usePunctuation &&
+            !previousWasDash &&
+            !itsDashTime &&
+            !inQuotes)
+        {
+            switch (GetRandomValue(0, 3))
+            {
+            case 0:
+                output.push_back(',');
+                break;
+            case 1:
+                output.push_back('.');
+                useCaplitalNext = true;
+                break;
+            case 2:
+                output.push_back('!');
+                useCaplitalNext = true;
+                break;
+            case 3:
+                output.push_back('?');
+                useCaplitalNext = true;
+                break;
             }
         }
 
@@ -171,20 +189,25 @@ std::u32string generateSentence(Context &context, int numberOfWords) {
     return output;
 }
 
-void restartTest(Context &context, bool repeat) {
-    if (!repeat) {
+void restartTest(Context& context, bool repeat)
+{
+    if (!repeat)
+    {
         int amount = context.testSettings.testModeAmounts[context.testSettings.selectedAmount];
 
         // If time mode is set put only 50 words after than it will be incremented as we type
-        if (context.testSettings.testMode == TestMode::TIME) {
+        if (context.testSettings.testMode == TestMode::TIME)
+        {
             amount = 120;
         }
 
         context.sentence = generateSentence(context, amount);
 
-        if (context.testSettings.usePunctuation) {
+        if (context.testSettings.usePunctuation)
+        {
             context.sentence[0] = toupper(context.sentence[0]);
-            if (context.testSettings.testMode == TestMode::WORDS && !useCaplitalNext) {
+            if (context.testSettings.testMode == TestMode::WORDS && !useCaplitalNext)
+            {
                 context.sentence += '.';
             }
         }
@@ -202,27 +225,31 @@ void restartTest(Context &context, bool repeat) {
     context.furthestVisitedIndex = -1;
 }
 
-void endTest(Context &context) {
+void endTest(Context& context)
+{
     context.testRunning = false;
     context.currentScreen = Screen::RESULT;
     context.testEndTime = GetTime();
 }
 
-bool getFileContent(std::string fileName, std::vector<std::u32string> & vecOfStrs) {
+bool getFileContent(std::string fileName, std::vector<std::u32string>& vecOfStrs)
+{
     // Open the File
     std::ifstream in(fileName.c_str());
 
     // Check if object is valid
-    if(!in) {
+    if (!in)
+    {
         std::cerr << "Cannot open the File : " << fileName << std::endl;
         return false;
     }
 
     std::string str;
     // Read the next line from File until it reaches the end.
-    while (std::getline(in, str)) {
+    while (std::getline(in, str))
+    {
         // Line contains string of length > 0 then save it in vector
-        if(!str.empty())
+        if (!str.empty())
             vecOfStrs.push_back(converter.from_bytes(str));
     }
 
@@ -252,7 +279,8 @@ EM_JS(void, setStorageBrowser, (unsigned int position, int value), {
 
 // Save integer value to storage file (to defined position)
 // NOTE: Storage positions is directly related to file memory layout (4 bytes each integer)
-bool saveStorageValue(unsigned int position, int value) {
+bool saveStorageValue(unsigned int position, int value)
+{
 #if defined(PLATFORM_WEB)
     setStorageBrowser(position, value);
     return true;
@@ -260,35 +288,44 @@ bool saveStorageValue(unsigned int position, int value) {
     bool success = false;
     int dataSize = 0;
     unsigned int newDataSize = 0;
-    const char *filePath = TextFormat("%s%s", GetApplicationDirectory(), STORAGE_DATA_FILE);
-    unsigned char *fileData = LoadFileData(filePath, &dataSize);
-    unsigned char *newFileData = NULL;
+    const char* filePath = TextFormat("%s%s", GetApplicationDirectory(), STORAGE_DATA_FILE);
+    unsigned char* fileData = LoadFileData(filePath, &dataSize);
+    unsigned char* newFileData = NULL;
 
-    if (fileData != NULL) {
-        if (dataSize <= (position*sizeof(int))) {
+    if (fileData != NULL)
+    {
+        if (dataSize <= (position * sizeof(int)))
+        {
             // Increase data size up to position and store value
-            newDataSize = (position + 1)*sizeof(int);
-            newFileData = (unsigned char *)RL_REALLOC(fileData, newDataSize);
+            newDataSize = (position + 1) * sizeof(int);
+            newFileData = (unsigned char*)RL_REALLOC(fileData, newDataSize);
 
-            if (newFileData != NULL) {
+            if (newFileData != NULL)
+            {
                 // RL_REALLOC succeded
-                int *dataPtr = (int *)newFileData;
+                int* dataPtr = (int*)newFileData;
                 dataPtr[position] = value;
-            } else {
+            }
+            else
+            {
                 // RL_REALLOC failed
-                TraceLog(LOG_WARNING, "FILEIO: [%s] Failed to realloc data (%u), position in bytes (%u) bigger than actual file size", filePath, dataSize, position*sizeof(int));
+                TraceLog(LOG_WARNING,
+                         "FILEIO: [%s] Failed to realloc data (%u), position in bytes (%u) bigger than actual file size",
+                         filePath, dataSize, position * sizeof(int));
 
                 // We store the old size of the file
                 newFileData = fileData;
                 newDataSize = dataSize;
             }
-        } else {
+        }
+        else
+        {
             // Store the old size of the file
             newFileData = fileData;
             newDataSize = dataSize;
 
             // Replace value on selected position
-            int *dataPtr = (int *)newFileData;
+            int* dataPtr = (int*)newFileData;
             dataPtr[position] = value;
         }
 
@@ -296,12 +333,14 @@ bool saveStorageValue(unsigned int position, int value) {
         RL_FREE(newFileData);
 
         TraceLog(LOG_INFO, "FILEIO: [%s] Saved storage value: %i", filePath, value);
-    } else {
+    }
+    else
+    {
         TraceLog(LOG_INFO, "FILEIO: [%s] File created successfully", filePath);
 
-        dataSize = (position + 1)*sizeof(int);
-        fileData = (unsigned char *)RL_MALLOC(dataSize);
-        int *dataPtr = (int *)fileData;
+        dataSize = (position + 1) * sizeof(int);
+        fileData = (unsigned char*)RL_MALLOC(dataSize);
+        int* dataPtr = (int*)fileData;
         dataPtr[position] = value;
 
         success = SaveFileData(filePath, fileData, dataSize);
@@ -315,21 +354,26 @@ bool saveStorageValue(unsigned int position, int value) {
 
 // Load integer value from storage file (from defined position)
 // NOTE: If requested position could not be found, value defaultValue is returned
-int loadStorageValue(unsigned int position, int defaultValue) {
+int loadStorageValue(unsigned int position, int defaultValue)
+{
 #if defined(PLATFORM_WEB)
     setStorageBrowserDefault(position, defaultValue);
     return getStorageBrowser(position);
 #endif
     int value = defaultValue;
     int dataSize = 0;
-    const char *filePath = TextFormat("%s%s", GetApplicationDirectory(), STORAGE_DATA_FILE);
-    unsigned char *fileData = LoadFileData(filePath, &dataSize);
+    const char* filePath = TextFormat("%s%s", GetApplicationDirectory(), STORAGE_DATA_FILE);
+    unsigned char* fileData = LoadFileData(filePath, &dataSize);
 
-    if (fileData != NULL) {
-        if (dataSize < (position*4)) {
+    if (fileData != NULL)
+    {
+        if (dataSize < (position * 4))
+        {
             TraceLog(LOG_WARNING, "FILEIO: [%s] Failed to find storage position: %i", filePath, position);
-        } else {
-            int *dataPtr = (int *)fileData;
+        }
+        else
+        {
+            int* dataPtr = (int*)fileData;
             value = dataPtr[position];
         }
 

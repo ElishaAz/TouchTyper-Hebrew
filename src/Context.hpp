@@ -4,27 +4,31 @@
 #include <vector>
 #include "../libs/raylib/src/raylib.h"
 
-enum class CursorStyle { BLOCK = 0 , LINE = 1, UNDERLINE = 2 };
+enum class CursorStyle { BLOCK = 0, LINE = 1, UNDERLINE = 2 };
 
-struct FontData {
+struct FontData
+{
     Font font;
     int size;
 };
 
-struct Sounds {
+struct Sounds
+{
     Sound clickSound1;
     Sound clickSound2;
     Sound clickSound3;
 };
 
-struct Fonts {
+struct Fonts
+{
     FontData titleFont;
     FontData typingTestFont;
     FontData tinyFont;
     FontData bigFont;
 };
 
-struct Theme {
+struct Theme
+{
     std::string name;
     Color background;
     Color cursor;
@@ -34,15 +38,18 @@ struct Theme {
     Color highlight;
 };
 
-struct WordList {
+struct WordList
+{
     std::string name;
     std::vector<std::u32string> words;
 };
 
 enum class TestMode { TIME = 0, WORDS };
+
 enum class Screen { TEST, RESULT };
 
-struct TestSettings {
+struct TestSettings
+{
     bool usePunctuation = false;
     bool useNumbers = false;
     TestMode testMode = TestMode::TIME;
@@ -50,7 +57,8 @@ struct TestSettings {
     int selectedAmount = 1;
 };
 
-struct Context {
+struct Context
+{
     int screenWidth;
     int screenHeight;
     Screen currentScreen;

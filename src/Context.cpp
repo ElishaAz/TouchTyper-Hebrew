@@ -4,7 +4,8 @@
 #include <iostream>
 #include "../libs/raylib/src/raylib.h"
 
-void Context::load() {
+void Context::load()
+{
     Theme arch;
     arch.name = u8"Arch";
     arch.background = {6, 7, 9, 255};
@@ -68,7 +69,7 @@ void Context::load() {
     Theme material;
     material.name = u8"Material";
     material.background = {33, 33, 33, 255};
-    material.text = {95 , 99, 99, 255};
+    material.text = {95, 99, 99, 255};
     material.cursor = {199, 146, 234, 255};
     material.wrong = {247, 140, 108, 255};
     material.correct = {195, 232, 141, 255};
@@ -78,33 +79,35 @@ void Context::load() {
     std::string base = GetApplicationDirectory();
 
     int codepoint_count = 0x7F + 0x6F;
-    int codepoints[codepoint_count] = { 0 };
+    int codepoints[codepoint_count] = {0};
     for (int i = 0; i < 0x7F; i++) codepoints[i] = i; // Basic Latin block
     for (int i = 0; i < 0x6F; i++) codepoints[0x7F + i] = 0x590 + i; // Hebrew block
 
     // Load fonts
     this->fonts.typingTestFont.size = 32;
-    this->fonts.typingTestFont.font = LoadFontEx((base+"assets/fonts/Cousine-Regular.ttf").c_str(),
-            this->fonts.typingTestFont.size, codepoints, codepoint_count);
+    this->fonts.typingTestFont.font = LoadFontEx((base + "assets/fonts/Cousine-Regular.ttf").c_str(),
+                                                 this->fonts.typingTestFont.size, codepoints, codepoint_count);
     this->fonts.titleFont.size = 40;
-    this->fonts.titleFont.font = LoadFontEx((base+"assets/fonts/NotoSansHebrew-Regular.ttf").c_str(),
-            this->fonts.titleFont.size, codepoints, codepoint_count);
+    this->fonts.titleFont.font = LoadFontEx((base + "assets/fonts/NotoSansHebrew-Regular.ttf").c_str(),
+                                            this->fonts.titleFont.size, codepoints, codepoint_count);
     this->fonts.tinyFont.size = 18;
-    this->fonts.tinyFont.font = LoadFontEx((base+"assets/fonts/Cousine-Regular.ttf").c_str(),
-            this->fonts.tinyFont.size, codepoints, codepoint_count);
+    this->fonts.tinyFont.font = LoadFontEx((base + "assets/fonts/Cousine-Regular.ttf").c_str(),
+                                           this->fonts.tinyFont.size, codepoints, codepoint_count);
     this->fonts.bigFont.size = 90;
-    this->fonts.bigFont.font = LoadFontEx((base+"assets/fonts/Cousine-Regular.ttf").c_str(),
-            this->fonts.bigFont.size, codepoints, codepoint_count);
+    this->fonts.bigFont.font = LoadFontEx((base + "assets/fonts/Cousine-Regular.ttf").c_str(),
+                                          this->fonts.bigFont.size, codepoints, codepoint_count);
 
 
     // Load word lists
-    FilePathList filesList = LoadDirectoryFiles((base+"assets/word_lists/").c_str());
-    char **files = filesList.paths;
+    FilePathList filesList = LoadDirectoryFiles((base + "assets/word_lists/").c_str());
+    char** files = filesList.paths;
     int numberOfFiles = filesList.count;
-    std::sort(files, files+numberOfFiles);
+    std::sort(files, files + numberOfFiles);
 
-    for (int i = 0; i < numberOfFiles; i++) {
-        if (files[i][0] != '.') {
+    for (int i = 0; i < numberOfFiles; i++)
+    {
+        if (files[i][0] != '.')
+        {
             WordList wordList;
             std::string name = files[i];
             name.replace(name.find(u8".txt"), sizeof(u8".txt") - 1, u8"");
@@ -119,7 +122,7 @@ void Context::load() {
     this->selectedWordList = loadStorageValue(1, 0);
 
     // Load sounds
-    this->sounds.clickSound1 = LoadSound((base+"assets/audio/otemu_browns.wav").c_str());
+    this->sounds.clickSound1 = LoadSound((base + "assets/audio/otemu_browns.wav").c_str());
 
     this->testSettings.selectedAmount = loadStorageValue(2, 1);
     this->testSettings.usePunctuation = loadStorageValue(3, 0);
@@ -129,12 +132,13 @@ void Context::load() {
 
     this->soundOn = loadStorageValue(7, 1);
 
-    #if defined(PLATFORM_WEB)
+#if defined(PLATFORM_WEB)
     this->soundOn = 0; // On web sound won't start playing until the user clicks on the page
-    #endif
+#endif
 }
 
-void Context::saveSettings() {
+void Context::saveSettings()
+{
     std::cout << "Settings saved" << std::endl;
     saveStorageValue(0, this->selectedTheme);
     saveStorageValue(1, this->selectedWordList);
@@ -146,7 +150,8 @@ void Context::saveSettings() {
     saveStorageValue(7, this->soundOn);
 }
 
-void Context::unload() {
+void Context::unload()
+{
     UnloadFont(this->fonts.typingTestFont.font);
     UnloadFont(this->fonts.tinyFont.font);
     UnloadFont(this->fonts.bigFont.font);
