@@ -101,14 +101,14 @@ void Context::load() {
     FilePathList filesList = LoadDirectoryFiles((base+"assets/word_lists/").c_str());
     char **files = filesList.paths;
     int numberOfFiles = filesList.count;
+    std::sort(files, files+numberOfFiles);
 
-    for (int i = numberOfFiles-1; i > -1; i--) {
+    for (int i = 0; i < numberOfFiles; i++) {
         if (files[i][0] != '.') {
             WordList wordList;
             std::string name = files[i];
             name.replace(name.find(u8".txt"), sizeof(u8".txt") - 1, u8"");
             name.replace(name.find('_'), sizeof('_') - 1, u8" ");
-            name[0] = toupper(name[0]);
             wordList.name = name;
             getFileContent(files[i], wordList.words);
             this->wordsLists.push_back(wordList);
