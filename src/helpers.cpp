@@ -13,8 +13,13 @@ Vector2 getCenter(int width, int height) {
     return result;
 }
 
-void drawMonospaceText(Font font, std::string text, Vector2 position, float fontSize, Color color) {
+void drawMonospaceText(Font font, std::string text, Vector2 position, float fontSize, Color color, const bool rtl) {
     Vector2 sizeOfCharacter = MeasureTextEx(font, "a", fontSize, 1);
+
+    if (rtl)
+    {
+        position.x += sizeOfCharacter.x * text.size();
+    }
 
     for (int i = 0; i < text.size(); ++i)
     {
@@ -36,7 +41,13 @@ void drawMonospaceText(Font font, std::string text, Vector2 position, float font
         memcpy(buf, &text[i], len);
 
         DrawTextEx(font, buf, position, fontSize, 1, color);
-        position.x += sizeOfCharacter.x;
+        if (rtl)
+        {
+            position.x -= sizeOfCharacter.x;
+        } else
+        {
+            position.x += sizeOfCharacter.x;
+        }
         i += len - 1;
     }
 }

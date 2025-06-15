@@ -120,7 +120,7 @@ void typingTest(Context &context) {
     for (auto& line : lines) {
         float widthOfLine = sizeOfCharacter.x * line.size();
 
-        float currentLetterX = center.x - (widthOfLine/2);
+        float currentLetterX = center.x + (widthOfLine/2);
 
         for (const char32_t& letter : line) {
             Color color = theme.text;
@@ -184,7 +184,7 @@ void typingTest(Context &context) {
                 }
             }
 
-            currentLetterX += sizeOfCharacter.x;
+            currentLetterX -= sizeOfCharacter.x;
             characterIndex++;
         }
 
