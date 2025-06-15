@@ -124,8 +124,11 @@ void typingTest(Context &context) {
 
         for (const char32_t& letter : line) {
             Color color = theme.text;
+            bool correct = true;
 
             if (context.input.size() > characterIndex) {
+                correct = letter == context.input[characterIndex];
+
                 // Check if the character is wrong
                 if (letter == context.input[characterIndex]) {
                     color = theme.correct;
@@ -133,7 +136,7 @@ void typingTest(Context &context) {
                     color = theme.wrong;
 
                     // Draw underline if space
-                    if (letter == ' ') {
+                    if (context.input[characterIndex] == ' ') {
                         DrawTextEx(context.fonts.typingTestFont.font, u8"_",
                                 {currentLetterX, currentLineY}, context.fonts.typingTestFont.size,
                                 1, color);
@@ -142,8 +145,10 @@ void typingTest(Context &context) {
                 }
             }
 
+            const char32_t shown_letter = correct ? letter : context.input[characterIndex];
+
             // Draw Text
-            DrawTextEx(context.fonts.typingTestFont.font, converter.to_bytes(std::u32string(1, letter)).c_str(),
+            DrawTextEx(context.fonts.typingTestFont.font, converter.to_bytes(std::u32string(1, shown_letter)).c_str(),
                     {currentLetterX, currentLineY}, context.fonts.typingTestFont.size,
                     1, color);
 
