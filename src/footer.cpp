@@ -120,15 +120,6 @@ void footer(Context& context)
     rec.width = (sizeOfCharacter.x * 5) + 8;
     DrawRectangleRoundedLines(rec, 0.1, 5, theme.text);
 
-    shortcut = u8"enter  -  new test";
-    position.x = getCenter(context.screenWidth, context.screenHeight).x - (sizeOfCharacter.x * shortcut.size()) / 2.0;
-    position.y -= sizeOfCharacter.y + 10;
-    drawMonospaceText(context.fonts.tinyFont.font, shortcut, position, context.fonts.tinyFont.size, theme.text);
-    rec.x = position.x - 4;
-    rec.y = position.y - 2;
-    rec.width = (sizeOfCharacter.x * 5) + 8;
-    DrawRectangleRoundedLines(rec, 0.1, 5, theme.text);
-
     // Draw options
     Vector2 themePosition = {
         bottomLeftPosition.x,

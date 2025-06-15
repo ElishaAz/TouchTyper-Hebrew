@@ -109,83 +109,45 @@ char quotes[3][2] = {
     {'(', ')'}
 };
 
-std::u32string generateSentence(Context& context, int numberOfWords)
+std::u32string getRandomWord(const Context& context)
 {
     auto words = context.wordsLists[context.selectedWordList].words;
     std::u32string output = U"";
+    int startPoint = GetRandomValue(0, words.size() - 1);
 
-    // Shuffle the amount of words we need
-    random_unique(words.begin(), words.end(), numberOfWords);
-
-    // Put the words in the senctence
-    for (int i = 0; i < numberOfWords; ++i)
+    ulong index = words.find_first_of(U" \n", startPoint);
+    index++;
+    if (index >= words.size())
     {
-        std::u32string word = words[i];
-
-        bool inQuotes = context.testSettings.usePunctuation && (GetRandomValue(0, 10) == 10);
-        bool itsDashTime = context.testSettings.usePunctuation && (GetRandomValue(0, 10) == 10) && !previousWasDash && !
-            useCaplitalNext;
-        bool itsNumber = context.testSettings.useNumbers && (GetRandomValue(0, 10) == 10);
-
-        if (useCaplitalNext)
-        {
-            word[0] = toupper(word[0]);
-        }
-
-        if (inQuotes)
-        {
-            int quote = GetRandomValue(0, 2);
-            output.push_back(quotes[quote][0]);
-            word += quotes[quote][1];
-        }
-        else if (itsDashTime)
-        {
-            word = U"-";
-        }
-
-        if (itsNumber)
-        {
-            word = converter.from_bytes(std::to_string(GetRandomValue(0, 1000)));
-        }
-
-        output += word;
-
-        useCaplitalNext = false;
-
-        // Put . or , randomly
-        if (GetRandomValue(0, 10) > 8 &&
-            context.testSettings.usePunctuation &&
-            !previousWasDash &&
-            !itsDashTime &&
-            !inQuotes)
-        {
-            switch (GetRandomValue(0, 3))
-            {
-            case 0:
-                output.push_back(',');
-                break;
-            case 1:
-                output.push_back('.');
-                useCaplitalNext = true;
-                break;
-            case 2:
-                output.push_back('!');
-                useCaplitalNext = true;
-                break;
-            case 3:
-                output.push_back('?');
-                useCaplitalNext = true;
-                break;
-            }
-        }
-
-        previousWasDash = itsDashTime;
-
-        output += U' ';
+        index = 0;
     }
 
-    output.pop_back();
+    while (words[index] == U' ' || words[index] == U'\n')
+    {
+        index++;
+        if (index >= words.size())
+        {
+            index = 0;
+        }
+    }
 
+    while (words[index] != U' ' && words[index] != U'\n')
+    {
+        output += words[index];
+        index++;
+        if (index >= words.size())
+        {
+            break;
+        }
+    }
+    return output;
+}
+
+std::u32string getWords(Context& context)
+{
+    auto words = context.wordsLists[context.selectedWordList].words;
+    std::u32string output;
+    output += words;
     return output;
 }
 
@@ -198,10 +160,16 @@ void restartTest(Context& context, bool repeat)
         // If time mode is set put only 50 words after than it will be incremented as we type
         if (context.testSettings.testMode == TestMode::TIME)
         {
-            amount = 120;
+            for (int i = 0; i < amount; i++)
+            {
+                if (i != 0) context.sentence += U" ";
+                context.sentence += getRandomWord(context);
+            }
         }
-
-        context.sentence = generateSentence(context, amount);
+        else
+        {
+            context.sentence = getWords(context);
+        }
 
         if (context.testSettings.usePunctuation)
         {
@@ -232,7 +200,7 @@ void endTest(Context& context)
     context.testEndTime = GetTime();
 }
 
-bool getFileContent(std::string fileName, std::vector<std::u32string>& vecOfStrs)
+bool getFileContent(std::string fileName, std::u32string& vecOfStrs)
 {
     // Open the File
     std::ifstream in(fileName.c_str());
@@ -248,9 +216,8 @@ bool getFileContent(std::string fileName, std::vector<std::u32string>& vecOfStrs
     // Read the next line from File until it reaches the end.
     while (std::getline(in, str))
     {
-        // Line contains string of length > 0 then save it in vector
         if (!str.empty())
-            vecOfStrs.push_back(converter.from_bytes(str));
+            vecOfStrs += converter.from_bytes(str) + U'\n';
     }
 
     //Close The File

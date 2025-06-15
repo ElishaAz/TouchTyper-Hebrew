@@ -35,9 +35,11 @@ void restartTest(Context& context, bool repeat);
 
 void endTest(Context& context);
 
-bool getFileContent(std::string fileName, std::vector<std::u32string>& vecOfStrs);
+bool getFileContent(std::string fileName, std::u32string& vecOfStrs);
 
-std::u32string generateSentence(Context& context, int words);
+std::u32string getRandomWord(const Context& context);
+
+std::u32string getWords(Context& context);
 
 extern std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
 

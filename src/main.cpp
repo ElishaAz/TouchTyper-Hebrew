@@ -6,10 +6,8 @@
 #include "helpers.hpp"
 #include "result.hpp"
 #include "footer.hpp"
-#include <iostream>
 #include <vector>
 #include <cmath>
-#include <unordered_set>
 
 #if defined(PLATFORM_WEB)
 #include <emscripten/emscripten.h>
@@ -129,6 +127,10 @@ void loop()
 #endif
 
     int key = GetCharPressed();
+    if (key == 0 && IsKeyPressed(KEY_ENTER) && !(IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)))
+    {
+        key = '\n';
+    }
 
     if (context.mouseOnClickable)
     {
@@ -140,9 +142,9 @@ void loop()
     }
     context.mouseOnClickable = false;
 
-    if (IsKeyPressed(KEY_ENTER))
+    if (IsKeyPressed(KEY_ENTER) && (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)))
     {
-        restartTest(context, IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT));
+        restartTest(context, true);
     }
 
     if (context.testRunning)
@@ -192,7 +194,6 @@ void loop()
 
         if (key && (context.input.size() < context.sentence.size()))
         {
-            printf("%x\n", key);
             context.input += static_cast<char32_t>(key);
 
             if (key != 0)
@@ -229,7 +230,7 @@ void loop()
                     if (context.sentence[context.input.size() - 1] == ' ')
                     {
                         context.sentence += ' ';
-                        context.sentence += generateSentence(context, 1);
+                        context.sentence += getRandomWord(context);
                     }
                 }
             }

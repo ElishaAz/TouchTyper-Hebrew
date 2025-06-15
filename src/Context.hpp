@@ -25,6 +25,7 @@ struct Fonts
     FontData typingTestFont;
     FontData tinyFont;
     FontData bigFont;
+    Font symbolsFont;
 };
 
 struct Theme
@@ -41,10 +42,10 @@ struct Theme
 struct WordList
 {
     std::string name;
-    std::vector<std::u32string> words;
+    std::u32string words;
 };
 
-enum class TestMode { TIME = 0, WORDS };
+enum class TestMode { WORDS = 0, TIME };
 
 enum class Screen { TEST, RESULT };
 
@@ -52,7 +53,7 @@ struct TestSettings
 {
     bool usePunctuation = false;
     bool useNumbers = false;
-    TestMode testMode = TestMode::TIME;
+    TestMode testMode = TestMode::WORDS;
     std::vector<int> testModeAmounts = {120, 60, 30, 15};
     int selectedAmount = 1;
 };

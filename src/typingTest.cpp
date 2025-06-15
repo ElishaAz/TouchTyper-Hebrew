@@ -101,6 +101,14 @@ void typingTest(Context& context)
             currentLine += currentWord;
             currentWord = U"";
         }
+        else if (context.sentence[i] == '\n')
+        {
+            currentWord += context.sentence[i];
+            currentLine += currentWord;
+            lines.push_back(currentLine);
+            currentLine = U"";
+            currentWord = U"";
+        }
         else
         {
             currentWord.push_back(context.sentence[i]);
@@ -137,12 +145,10 @@ void typingTest(Context& context)
         for (const char32_t& letter : line)
         {
             Color color = theme.text;
-            bool correct = true;
+            char32_t shown_letter = letter;
 
             if (context.input.size() > characterIndex)
             {
-                correct = letter == context.input[characterIndex];
-
                 // Check if the character is wrong
                 if (letter == context.input[characterIndex])
                 {
@@ -151,23 +157,31 @@ void typingTest(Context& context)
                 else
                 {
                     color = theme.wrong;
+                    shown_letter = context.input[characterIndex];
 
                     // Draw underline if space
                     if (context.input[characterIndex] == ' ')
                     {
-                        DrawTextEx(context.fonts.typingTestFont.font, u8"_",
-                                   {currentLetterX, currentLineY}, context.fonts.typingTestFont.size,
-                                   1, color);
+                        shown_letter = U'\u2423';
                     }
                 }
             }
 
-            const char32_t shown_letter = correct ? letter : context.input[characterIndex];
+
+            if (shown_letter == '\n')
+            {
+                shown_letter = U'\u2B91';
+            }
+
+            Font font = context.fonts.typingTestFont.font;
+            if (shown_letter > 0x2000)
+            {
+                font = context.fonts.symbolsFont;
+            }
 
             // Draw Text
-            DrawTextEx(context.fonts.typingTestFont.font, converter.to_bytes(std::u32string(1, shown_letter)).c_str(),
-                       {currentLetterX, currentLineY}, context.fonts.typingTestFont.size,
-                       1, color);
+            DrawTextCodepoint(font, shown_letter, {currentLetterX, currentLineY}, context.fonts.typingTestFont.size,
+                              color);
 
             // Handle cursor
             if (characterIndex == context.input.size())

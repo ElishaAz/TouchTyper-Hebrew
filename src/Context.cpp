@@ -97,6 +97,12 @@ void Context::load()
     this->fonts.bigFont.font = LoadFontEx((base + "assets/fonts/Cousine-Regular.ttf").c_str(),
                                           this->fonts.bigFont.size, codepoints, codepoint_count);
 
+    int symbol_codepoint_count = 2;
+    int symbol_codepoints[symbol_codepoint_count] = {0x2B91, 0x2423}; // Enter and Space
+
+    this->fonts.symbolsFont = LoadFontEx((base + "assets/fonts/NotoSansSymbols-Regular.ttf").c_str(),
+                                          this->fonts.bigFont.size, symbol_codepoints, symbol_codepoint_count);
+
 
     // Load word lists
     FilePathList filesList = LoadDirectoryFiles((base + "assets/word_lists/").c_str());
