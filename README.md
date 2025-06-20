@@ -49,3 +49,15 @@ You need to have Visual Studio 2019 (other versions aren't tested, please tell u
 5. Setup CMake. `cmake .. -DCMAKE_BUILD_TYPE=Release`
 6. Let's build the project! Run `cmake --build .`
 7. Go into Debug, your build of TouchTyper is there. You have now compiled TouchTyper for Windows using MSVC.
+
+## Cross-Compile from Linux for Windows (MinGW)
+
+You need MinGW installed: `sudo apt install mingw64`.
+
+1. Clone the repository using Git. Execute this in a terminal: `git clone https://github.com/ElishaAz/TouchTyper-Hebrew`
+2. Cd into TouchTyper. `cd TouchTyper`
+3. Install the raylib git submodule using `git submodule update --init --recursive --depth=1`
+4. Make a build folder. `mkdir build; cd build`
+5. Setup CMake. `cmake -DCMAKE_TOOLCHAIN_FILE=toolchain-mingw64.cmake -DCMAKE_BUILD_TYPE=release -DCMAKE_CXX_FLAGS="-static" ..`
+6. Build the project: `make`
+7. Test it: `wine TouchTyper.exe`
