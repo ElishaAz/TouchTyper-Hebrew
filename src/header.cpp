@@ -5,7 +5,6 @@
 #include <vector>
 #include "../libs/raylib/src/raymath.h"
 
-std::vector<std::string> firstOptions = {u8"numbers", u8"punctuation"};
 std::vector<std::string> secondOptions = {u8"words", u8"time"};
 float targetBarHeight = 0;
 float barHeight = 0;
@@ -30,11 +29,7 @@ void options(Context &context, std::vector<std::string> &options, Vector2 &start
             context.mouseOnClickable = true;
 
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                if (word == firstOptions[0]) {
-                    context.testSettings.useNumbers = !context.testSettings.useNumbers;
-                } else if (word == firstOptions[1]) {
-                    context.testSettings.usePunctuation = !context.testSettings.usePunctuation;
-                } else if (word == secondOptions[0]) {
+                if (word == secondOptions[0]) {
                     context.testSettings.testMode = TestMode::WORDS;
                 } else if (word == secondOptions[1]) {
                     context.testSettings.testMode = TestMode::TIME;
@@ -50,9 +45,7 @@ void options(Context &context, std::vector<std::string> &options, Vector2 &start
             }
         }
 
-        if ((word == firstOptions[1] && context.testSettings.usePunctuation) ||
-            (word == firstOptions[0] && context.testSettings.useNumbers) ||
-            (word == secondOptions[1] && context.testSettings.testMode == TestMode::TIME) ||
+        if ((word == secondOptions[1] && context.testSettings.testMode == TestMode::TIME) ||
             (word == secondOptions[0] && context.testSettings.testMode == TestMode::WORDS) ||
             (isAmounts && i == context.testSettings.selectedAmount)) {
             color = theme.correct;
@@ -117,9 +110,6 @@ void header(Context &context) {
     Vector2 sizeOfCharacter = MeasureTextEx(context.fonts.tinyFont.font, "a",
             context.fonts.tinyFont.size, 1);
 
-    options(context, firstOptions, startingPosition, sizeOfCharacter, false);
-    startingPosition = topRightPosition;
-    startingPosition.y += sizeOfCharacter.y;
     options(context, secondOptions, startingPosition, sizeOfCharacter, false);
 
     startingPosition.x = topRightPosition.x;

@@ -170,15 +170,6 @@ void restartTest(Context& context, bool repeat)
         {
             context.sentence = getWords(context);
         }
-
-        if (context.testSettings.usePunctuation)
-        {
-            context.sentence[0] = toupper(context.sentence[0]);
-            if (context.testSettings.testMode == TestMode::WORDS && !useCaplitalNext)
-            {
-                context.sentence += '.';
-            }
-        }
     }
 
     context.input = U"";

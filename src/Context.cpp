@@ -131,8 +131,6 @@ void Context::load()
     this->sounds.clickSound1 = LoadSound((base + "assets/audio/otemu_browns.wav").c_str());
 
     this->testSettings.selectedAmount = loadStorageValue(2, 1);
-    this->testSettings.usePunctuation = loadStorageValue(3, 0);
-    this->testSettings.useNumbers = loadStorageValue(4, 0);
     this->testSettings.testMode = (TestMode)loadStorageValue(5, 0);
     this->cursorStyle = (CursorStyle)loadStorageValue(6, 0);
 
@@ -149,8 +147,6 @@ void Context::saveSettings()
     saveStorageValue(0, this->selectedTheme);
     saveStorageValue(1, this->selectedWordList);
     saveStorageValue(2, this->testSettings.selectedAmount);
-    saveStorageValue(3, this->testSettings.usePunctuation);
-    saveStorageValue(4, this->testSettings.useNumbers);
     saveStorageValue(5, (int)this->testSettings.testMode);
     saveStorageValue(6, (int)this->cursorStyle);
     saveStorageValue(7, this->soundOn);

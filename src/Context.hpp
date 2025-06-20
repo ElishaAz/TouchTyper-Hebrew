@@ -51,8 +51,6 @@ enum class Screen { TEST, RESULT };
 
 struct TestSettings
 {
-    bool usePunctuation = false;
-    bool useNumbers = false;
     TestMode testMode = TestMode::WORDS;
     std::vector<int> testModeAmounts = {120, 60, 30, 15};
     int selectedAmount = 1;
