@@ -25,9 +25,15 @@ int loadStorageValue(unsigned int position, int defaultValue);
 
 Vector2 getCenter(int width, int height);
 
+int getCodepointAt(const char *text, char * out, int index = 0);
+
+int numOfCodepoints(const std::string& text);
+
+void drawText(Font font, std::string text, Vector2 position, float fontSize, Color color, bool rtl = false);
+
 void drawMonospaceText(Font font, std::string text, Vector2 position, float fontSize, Color color, bool rtl = false);
 
-bool textButton(Context& context, Vector2 positon, std::string text);
+bool textButton(Context& context, Vector2 positon, std::string text, bool rtl = false);
 
 double getTimeInMin();
 

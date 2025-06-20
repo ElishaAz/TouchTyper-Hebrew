@@ -116,8 +116,17 @@ void Context::load()
         {
             WordList wordList;
             std::string name = files[i];
+
+            if (name.find_last_of(u8".txt") != name.size() - 1)
+            {
+                // Not a text file
+                continue;
+            }
             name.replace(name.find(u8".txt"), sizeof(u8".txt") - 1, u8"");
-            name.replace(name.find('_'), sizeof('_') - 1, u8" ");
+            if (name.find_last_of("/\\") != std::string::npos) // Remove the path
+                name = name.substr(name.find_last_of("/\\") + 1);
+            if (name.find('_') != std::string::npos) // Remove underscores
+                name.replace(name.find('_'), sizeof('_') - 1, u8" ");
             wordList.name = name;
             getFileContent(files[i], wordList.words);
             this->wordsLists.push_back(wordList);

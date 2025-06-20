@@ -12,7 +12,7 @@ bool showThemesOptions = false;
 bool showWordListOptions = false;
 bool showCursorOptions = false;
 
-int optionSelect(Context& context, std::vector<std::string>& options, int selected)
+int optionSelect(Context& context, std::vector<std::string>& options, int selected, const bool rtl)
 {
     Vector2 sizeOfCharacter = MeasureTextEx(context.fonts.tinyFont.font, "a",
                                             context.fonts.tinyFont.size, 1);
@@ -62,7 +62,7 @@ int optionSelect(Context& context, std::vector<std::string>& options, int select
         }
 
         startingPosition.y += optionPadding;
-        drawMonospaceText(context.fonts.tinyFont.font, option, startingPosition, context.fonts.tinyFont.size, color);
+        drawMonospaceText(context.fonts.tinyFont.font, option, startingPosition, context.fonts.tinyFont.size, color, rtl);
         startingPosition.y += sizeOfCharacter.y + optionPadding;
     }
 
@@ -134,7 +134,7 @@ void footer(Context& context)
             themeOptions.push_back(theme.name);
         }
 
-        int selected = optionSelect(context, themeOptions, context.selectedTheme);
+        int selected = optionSelect(context, themeOptions, context.selectedTheme, true);
 
         if (selected != -1)
         {
@@ -143,7 +143,7 @@ void footer(Context& context)
         }
     }
 
-    if (textButton(context, themePosition, u8"theme"))
+    if (textButton(context, themePosition, u8"צבעים", true))
     {
         showThemesOptions = !showThemesOptions;
     }
@@ -166,7 +166,7 @@ void footer(Context& context)
             wordListOptions.push_back(wordList.name);
         }
 
-        int selected = optionSelect(context, wordListOptions, context.selectedWordList);
+        int selected = optionSelect(context, wordListOptions, context.selectedWordList, true);
 
         if (selected != -1)
         {
@@ -176,7 +176,7 @@ void footer(Context& context)
         }
     }
 
-    if (textButton(context, worldlistPosition, u8"word list"))
+    if (textButton(context, worldlistPosition, u8"שיעורים", true))
     {
         showWordListOptions = !showWordListOptions;
     }
@@ -192,8 +192,8 @@ void footer(Context& context)
 
     if (showCursorOptions)
     {
-        std::vector<std::string> cursorOptions = {u8"Block", u8"Line", u8"Underline"};
-        int selected = optionSelect(context, cursorOptions, (int)context.cursorStyle);
+        std::vector<std::string> cursorOptions = {u8"בלוק", u8"קו", u8"קו תחתון"};
+        int selected = optionSelect(context, cursorOptions, (int)context.cursorStyle, true);
 
         if (selected != -1)
         {
@@ -201,7 +201,7 @@ void footer(Context& context)
         }
     }
 
-    if (textButton(context, cursorPosition, u8"cursor"))
+    if (textButton(context, cursorPosition, u8"סמן", true))
     {
         showCursorOptions = !showCursorOptions;
     }
@@ -215,7 +215,7 @@ void footer(Context& context)
         cursorPosition.y
     };
 
-    if (textButton(context, soundPosition, context.soundOn ? u8"sound on" : u8"sound off"))
+    if (textButton(context, soundPosition, context.soundOn ? u8"עם קול" : u8"בלי קול", true))
     {
         context.soundOn = !context.soundOn;
     }

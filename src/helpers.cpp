@@ -14,33 +14,94 @@ Vector2 getCenter(int width, int height)
     return result;
 }
 
-void drawMonospaceText(Font font, std::string text, Vector2 position, float fontSize, Color color, const bool rtl)
+int getCodepointAt(const char *text, char * out, int index)
 {
-    Vector2 sizeOfCharacter = MeasureTextEx(font, "a", fontSize, 1);
+    const unsigned char lb = text[index];
+
+    int len = 0;
+
+    if ((lb & 0x80) == 0) // lead bit is zero, must be a single ascii
+        len = 1;
+    else if ((lb & 0xE0) == 0xC0) // 110x xxxx
+        len = 2;
+    else if ((lb & 0xF0) == 0xE0) // 1110 xxxx
+        len = 3;
+    else if ((lb & 0xF8) == 0xF0) // 1111 0xxx
+        len = 4;
+    else
+        return -1;
+    memcpy(out, &text[index], len);
+    return len;
+}
+
+int numOfCodepoints(const std::string& text)
+{
+    // Get the actual number of characters
+    const char* s = text.c_str();
+    int size = 0;
+    while (*s) size += (*s++ & 0xc0) != 0x80;
+    return size;
+}
+
+void drawText(Font font, std::string text, Vector2 position, float fontSize, Color color, const bool rtl)
+{
+    Vector2 overallSize = MeasureTextEx(font, text.c_str(), fontSize, 1);
 
     if (rtl)
     {
-        position.x += sizeOfCharacter.x * text.size();
+        position.x += overallSize.x;
     }
 
     for (int i = 0; i < text.size(); ++i)
     {
-        unsigned char lb = text[i];
+
         char buf[5] = {0, 0, 0, 0, 0};
+        const int len = getCodepointAt(text.c_str(), buf, i);
 
-        int len = 0;
+        Vector2 sizeOfCharacter = MeasureTextEx(font, buf, fontSize, 1);
 
-        if ((lb & 0x80) == 0) // lead bit is zero, must be a single ascii
-            len = 1;
-        else if ((lb & 0xE0) == 0xC0) // 110x xxxx
-            len = 2;
-        else if ((lb & 0xF0) == 0xE0) // 1110 xxxx
-            len = 3;
-        else if ((lb & 0xF8) == 0xF0) // 1111 0xxx
-            len = 4;
-        else
-            continue;
-        memcpy(buf, &text[i], len);
+        if (rtl)
+        {
+            position.x -= sizeOfCharacter.x;
+        }
+
+        DrawTextEx(font, buf, position, fontSize, 1, color);
+
+        if (!rtl)
+        {
+            position.x += sizeOfCharacter.x;
+        }
+
+        i += len - 1;
+    }
+}
+
+void drawMonospaceText(Font font, std::string text, Vector2 position, float fontSize, Color color, const bool rtl)
+{
+    Vector2 sizeOfCharacter = MeasureTextEx(font, "a", fontSize, 1);
+    const int size = numOfCodepoints(text);
+
+    if (rtl)
+    {
+        position.x += sizeOfCharacter.x * size;
+    }
+
+    for (int i = 0; i < text.size(); ++i)
+    {
+        if (rtl && '0' <= text[i] && text[i] <= '9')
+        {
+            int start = i;
+            while ('0' <= text[i] && text[i] <= '9')
+            {
+                i ++;
+            }
+            int count = i - start;
+            position.x -= sizeOfCharacter.x * count;
+            drawMonospaceText(font, text.substr(start, count), position, fontSize, color, false);
+        }
+
+        char buf[5] = {0, 0, 0, 0, 0};
+        const int len = getCodepointAt(text.c_str(), buf, i);
 
         DrawTextEx(font, buf, position, fontSize, 1, color);
         if (rtl)
@@ -55,16 +116,18 @@ void drawMonospaceText(Font font, std::string text, Vector2 position, float font
     }
 }
 
-bool textButton(Context& context, Vector2 positon, std::string text)
+bool textButton(Context& context, Vector2 positon, std::string text, const bool rtl)
 {
     Vector2 sizeOfCharacter = MeasureTextEx(context.fonts.tinyFont.font, "a",
                                             context.fonts.tinyFont.size, 1);
     Theme theme = context.themes[context.selectedTheme];
 
+    const int size = numOfCodepoints(text);
+
     Rectangle rect = {
         positon.x,
         positon.y,
-        sizeOfCharacter.x * text.size(),
+        sizeOfCharacter.x * size,
         sizeOfCharacter.y
     };
 
@@ -80,7 +143,7 @@ bool textButton(Context& context, Vector2 positon, std::string text)
         }
     }
 
-    drawMonospaceText(context.fonts.tinyFont.font, text, positon, context.fonts.tinyFont.size, color);
+    drawMonospaceText(context.fonts.tinyFont.font, text, positon, context.fonts.tinyFont.size, color, rtl);
 
     return false;
 }

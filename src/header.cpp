@@ -5,7 +5,7 @@
 #include <vector>
 #include "../libs/raylib/src/raymath.h"
 
-std::vector<std::string> secondOptions = {u8"words", u8"time"};
+std::vector<std::string> secondOptions = {u8"מילים", u8"זמן"};
 float targetBarHeight = 0;
 float barHeight = 0;
 
@@ -15,13 +15,18 @@ void options(Context &context, std::vector<std::string> &options, Vector2 &start
     for (int i = 0; i < options.size(); i++) {
         auto word = options[i];
 
+        // Get the actual number of characters
+        const char* s = word.c_str();
+        int len = 0;
+        while (*s) len += (*s++ & 0xc0) != 0x80;
+
         Vector2 optionPosition = startingPosition;
-        optionPosition.x -= word.size() * sizeOfCharacter.x;
+        optionPosition.x -= len * sizeOfCharacter.x;
         Color color = theme.text;
         Rectangle optionRect;
         optionRect.x = optionPosition.x;
         optionRect.y = optionPosition.y;
-        optionRect.width = word.size() * sizeOfCharacter.x + sizeOfCharacter.x;
+        optionRect.width = len * sizeOfCharacter.x + sizeOfCharacter.x;
         optionRect.height = sizeOfCharacter.y;
 
         if (CheckCollisionPointRec(GetMousePosition(), optionRect)) {
@@ -51,11 +56,11 @@ void options(Context &context, std::vector<std::string> &options, Vector2 &start
             color = theme.correct;
         }
 
-        drawMonospaceText(context.fonts.tinyFont.font, word, optionPosition, context.fonts.tinyFont.size, color);
-        optionPosition.x += sizeOfCharacter.x * word.size();
+        drawMonospaceText(context.fonts.tinyFont.font, word, optionPosition, context.fonts.tinyFont.size, color, true);
+        optionPosition.x += sizeOfCharacter.x * len;
 
         startingPosition = optionPosition;
-        startingPosition.x -= word.size() * sizeOfCharacter.x + sizeOfCharacter.x;
+        startingPosition.x -= len * sizeOfCharacter.x + sizeOfCharacter.x;
     }
 }
 
@@ -82,10 +87,10 @@ void header(Context &context) {
         color = theme.correct;
         switch (context.currentScreen) {
             case Screen::TEST:
-                text = u8"start typing";
+                text = u8"התחל להקליד";
                 break;
             case Screen::RESULT:
-                text = u8"result";
+                text = u8"תוצאות";
                 break;
         }
     } else {
@@ -98,9 +103,7 @@ void header(Context &context) {
     }
 
     if (!context.testRunning) {
-        DrawTextEx(context.fonts.titleFont.font,
-                text.c_str(), topLeftPosition,
-                context.fonts.titleFont.size, 1, color);
+        drawText(context.fonts.titleFont.font, text, topLeftPosition, context.fonts.titleFont.size, color, true);
     } else {
         drawMonospaceText(context.fonts.titleFont.font, text, topLeftPosition, context.fonts.titleFont.size, color);
     }

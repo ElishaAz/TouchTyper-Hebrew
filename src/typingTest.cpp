@@ -208,7 +208,7 @@ void typingTest(Context& context)
 
                         break;
                     case CursorStyle::LINE:
-                        DrawRectangle(cursorPostion.x, cursorPostion.y,
+                        DrawRectangle(cursorPostion.x + sizeOfCharacter.x, cursorPostion.y,
                                       2, sizeOfCharacter.y,
                                       cursorColor);
 
