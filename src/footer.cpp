@@ -61,9 +61,20 @@ int optionSelect(Context& context, std::vector<std::string>& options, int select
             color = theme.background;
         }
 
+        if (rtl)
+        {
+            Vector2 textSize = MeasureTextEx(context.fonts.tinyFont.font, option.c_str(), context.fonts.tinyFont.size, 1);
+            startingPosition.x = rect.x + rect.width - textSize.x - optionsContainerPadding;
+        }
+
         startingPosition.y += optionPadding;
         drawMonospaceText(context.fonts.tinyFont.font, option, startingPosition, context.fonts.tinyFont.size, color, rtl);
         startingPosition.y += sizeOfCharacter.y + optionPadding;
+
+        if (rtl)
+        {
+            startingPosition.x = rect.x + optionsContainerPadding;
+        }
     }
 
     DrawRectangleLinesEx(rect, 1, theme.correct);
