@@ -254,15 +254,15 @@ void endTest(Context& context)
     context.testEndTime = GetTime();
 }
 
-bool getFileContent(std::string fileName, std::u32string& vecOfStrs)
+bool getFileContent(std::filesystem::path path, std::u32string& vecOfStrs)
 {
     // Open the File
-    std::ifstream in(fileName.c_str());
+    std::ifstream in(path);
 
     // Check if object is valid
     if (!in)
     {
-        std::cerr << "Cannot open the File : " << fileName << std::endl;
+        std::cerr << "Cannot open the File : " << path << std::endl;
         return false;
     }
 

@@ -3,6 +3,7 @@
 #include "helpers.hpp"
 #include <iostream>
 #include "../libs/raylib/src/raylib.h"
+#include <filesystem>
 
 void Context::load()
 {
@@ -103,19 +104,21 @@ void Context::load()
     this->fonts.symbolsFont = LoadFontEx((base + "assets/fonts/NotoSansSymbols-Regular.ttf").c_str(),
                                           this->fonts.bigFont.size, symbol_codepoints, symbol_codepoint_count);
 
+    std::vector<std::filesystem::path> paths;
 
-    // Load word lists
-    FilePathList filesList = LoadDirectoryFiles((base + "assets/word_lists/").c_str());
-    char** files = filesList.paths;
-    int numberOfFiles = filesList.count;
-    std::sort(files, files + numberOfFiles);
+    for (const auto & entry : std::filesystem::directory_iterator((base + "assets/word_lists/").c_str())) {
+        paths.push_back(entry.path());
+    }
 
-    for (int i = 0; i < numberOfFiles; i++)
+    std::sort(paths.begin(), paths.end());
+
+    for (int i = 0; i < paths.size(); i++)
     {
-        if (files[i][0] != '.')
+        std::cout << "File: " << paths[i] << std::endl;
+        std::string name = paths[i].filename().string();
+        if (name[0] != '.')
         {
             WordList wordList;
-            std::string name = files[i];
 
             if (name.find_last_of(u8".txt") != name.size() - 1)
             {
@@ -127,8 +130,9 @@ void Context::load()
                 name = name.substr(name.find_last_of("/\\") + 1);
             if (name.find('_') != std::string::npos) // Remove underscores
                 name.replace(name.find('_'), sizeof('_') - 1, u8" ");
+            std::cout << "Name: " << name << ", " << std::hex << (int)name[0] << " " << std::hex << (int)name[1] << std::endl;
             wordList.name = name;
-            getFileContent(files[i], wordList.words);
+            getFileContent(paths[i], wordList.words);
             this->wordsLists.push_back(wordList);
         }
     }
