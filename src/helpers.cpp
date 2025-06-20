@@ -178,7 +178,7 @@ std::u32string getRandomWord(const Context& context)
     std::u32string output = U"";
     int startPoint = GetRandomValue(0, words.size() - 1);
 
-    ulong index = words.find_first_of(U" \n", startPoint);
+    int index = words.find_first_of(U" \n", startPoint);
     index++;
     if (index >= words.size())
     {

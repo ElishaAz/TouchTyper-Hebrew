@@ -78,7 +78,7 @@ void Context::load()
 
     std::string base = GetApplicationDirectory();
 
-    int codepoint_count = 0x7F + 0x6F;
+    const int codepoint_count = 0x7F + 0x6F;
     int codepoints[codepoint_count] = {0};
     for (int i = 0; i < 0x7F; i++) codepoints[i] = i; // Basic Latin block
     for (int i = 0; i < 0x6F; i++) codepoints[0x7F + i] = 0x590 + i; // Hebrew block
@@ -97,7 +97,7 @@ void Context::load()
     this->fonts.bigFont.font = LoadFontEx((base + "assets/fonts/Cousine-Regular.ttf").c_str(),
                                           this->fonts.bigFont.size, codepoints, codepoint_count);
 
-    int symbol_codepoint_count = 2;
+    const int symbol_codepoint_count = 2;
     int symbol_codepoints[symbol_codepoint_count] = {0x2B91, 0x2423}; // Enter and Space
 
     this->fonts.symbolsFont = LoadFontEx((base + "assets/fonts/NotoSansSymbols-Regular.ttf").c_str(),
